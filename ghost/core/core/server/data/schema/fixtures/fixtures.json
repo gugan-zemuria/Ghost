@@ -42,16 +42,6 @@
             ]
         },
         {
-            "name": "Newsletter",
-            "entries": [
-                {
-                    "name":             "Default Newsletter",
-                    "slug":             "default-newsletter",
-                    "show_header_name": false
-                }
-            ]
-        },
-        {
             "name": "Tag",
             "entries": [
                 {
@@ -587,26 +577,6 @@
                     "object_type": "custom_theme_setting"
                 },
                 {
-                    "name": "Browse newsletters",
-                    "action_type": "browse",
-                    "object_type": "newsletter"
-                },
-                {
-                    "name": "Read newsletters",
-                    "action_type": "read",
-                    "object_type": "newsletter"
-                },
-                {
-                    "name": "Add newsletters",
-                    "action_type": "add",
-                    "object_type": "newsletter"
-                },
-                {
-                    "name": "Edit newsletters",
-                    "action_type": "edit",
-                    "object_type": "newsletter"
-                },
-                {
                     "name": "Browse comments",
                     "action_type": "browse",
                     "object_type": "comment"
@@ -867,7 +837,6 @@
                     "offer": "all",
                     "authentication": "resetAllPasswords",
                     "members_stripe_connect": "auth",
-                    "newsletter": "all",
                     "explore": "read",
                     "comment": "all",
                     "link": "all",
@@ -912,7 +881,6 @@
                     "snippet": "all",
                     "product": ["browse", "read", "add", "edit"],
                     "offer": ["browse", "read", "add", "edit"],
-                    "newsletter": ["browse", "read", "add", "edit"],
                     "explore": "read",
                     "comment": "all",
                     "link": "all",
@@ -936,7 +904,6 @@
                     "snippet": "all",
                     "label": ["browse", "read", "edit", "add", "destroy"],
                     "product": ["browse", "read"],
-                    "newsletter": ["browse", "read"],
                     "collection": "all",
                     "recommendation": ["browse", "read"],
                     "member": ["browse", "read", "add", "edit", "destroy"],
@@ -959,7 +926,6 @@
                     "snippet": "all",
                     "label": ["browse", "read"],
                     "product": ["browse", "read"],
-                    "newsletter": ["browse", "read"],
                     "collection": "all",
                     "recommendation": ["browse", "read"]
                 },
@@ -976,7 +942,6 @@
                     "snippet": ["browse", "read"],
                     "label": ["browse", "read"],
                     "product": ["browse", "read"],
-                    "newsletter": ["browse", "read"],
                     "collection": ["browse", "read", "add"],
                     "recommendation": ["browse", "read"]
                 },

@@ -4,7 +4,7 @@ import {isBlank} from '@ember/utils';
 import {inject as service} from '@ember/service';
 
 export const EMAIL_EVENTS = ['email_sent_event', 'email_delivered_event', 'email_opened_event','email_failed_event', 'email_complaint_event'];
-export const NEWSLETTER_EVENTS = ['newsletter_event'];
+// Newsletter feature removed
 
 @classic
 export default class MembersEventFilter extends Helper {
@@ -18,7 +18,7 @@ export default class MembersEventFilter extends Helper {
         const excludedEventsSet = new Set();
 
         if (this.settings.editorDefaultEmailRecipients === 'disabled') {
-            [...EMAIL_EVENTS, ...NEWSLETTER_EVENTS].forEach(type => excludedEventsSet.add(type));
+            [...EMAIL_EVENTS].forEach(type => excludedEventsSet.add(type));
         }
         if (this.settings.commentsEnabled === 'off') {
             excludedEventsSet.add('comment_event');

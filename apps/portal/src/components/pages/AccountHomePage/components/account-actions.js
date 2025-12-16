@@ -3,7 +3,6 @@ import {useContext} from 'react';
 import {hasCommentsEnabled, hasMultipleNewsletters, isEmailSuppressed, hasNewsletterSendingEnabled} from '../../../../utils/helpers';
 
 import PaidAccountActions from './paid-account-actions';
-import EmailNewsletterAction from './email-newsletter-action';
 import EmailPreferencesAction from './email-preferences-action';
 import {t} from '../../../../utils/i18n';
 
@@ -15,13 +14,7 @@ const shouldShowEmailPreferences = (site, member) => {
     );
 };
 
-const shouldShowEmailNewsletterAction = (site) => {
-    return (
-        !hasMultipleNewsletters({site}) &&
-    hasNewsletterSendingEnabled({site}) &&
-    !hasCommentsEnabled({site})
-    );
-};
+
 
 const AccountActions = () => {
     const {member, doAction, site} = useContext(AppContext);
@@ -37,7 +30,6 @@ const AccountActions = () => {
     // Extract helper functions for complex conditions
 
     const showEmailPreferences = shouldShowEmailPreferences(site, member);
-    const showEmailNewsletterAction = shouldShowEmailNewsletterAction(site);
 
     return (
         <div>
@@ -58,7 +50,6 @@ const AccountActions = () => {
 
                 <PaidAccountActions />
                 {showEmailPreferences && <EmailPreferencesAction />}
-                {showEmailNewsletterAction && <EmailNewsletterAction />}
             </div>
 
         </div>

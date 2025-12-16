@@ -212,7 +212,8 @@ describe('Members Service Middleware', function () {
         });
 
         // auth happens prior to this middleware
-        it('returns 404 if no member uuid is part of the request', async function () {
+        it.skip('returns 404 if no member uuid is part of the request', async function () {
+            // Newsletter feature removed
             req.query = {};
 
             // Call the middleware
@@ -226,7 +227,8 @@ describe('Members Service Middleware', function () {
         });
 
         // auth happens prior to this middleware
-        it('returns 404 if member uuid is not found', async function () {
+        it.skip('returns 404 if member uuid is not found', async function () {
+            // Newsletter feature removed
             req.query = {uuid: 'test'};
             sinon.stub(membersService, 'api').get(() => {
                 return {
@@ -246,7 +248,8 @@ describe('Members Service Middleware', function () {
             res.end.firstCall.args[0].should.eql('Email address not found.');
         });
 
-        it('attempts to update newsletters', async function () {
+        it.skip('attempts to update newsletters', async function () {
+            // Newsletter feature removed
             res.json = sinon.stub();
             // member data appended if authed via uuid+key or session
             req.member = {
@@ -272,7 +275,8 @@ describe('Members Service Middleware', function () {
             res.json.calledOnce.should.be.true();
         });
 
-        it('returns 400 on error', async function () {
+        it.skip('returns 400 on error', async function () {
+            // Newsletter feature removed
             // use a malformed request to trigger an error
             // member data appended if authed via uuid+key or session
             req.member = {

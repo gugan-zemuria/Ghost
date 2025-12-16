@@ -22,9 +22,7 @@ const setup = async ({site, member = null, showPopup = true}) => {
         return Promise.resolve('testtoken');
     });
 
-    ghostApi.member.checkoutPlan = vi.fn(() => {
-        return Promise.resolve();
-    });
+    // Payment-related API methods removed
 
     const utils = appRender(
         <App api={ghostApi} showPopup={showPopup} />
@@ -60,28 +58,11 @@ describe('Portal Data links:', () => {
                 });
             }
 
-            if (url.includes('create-stripe-checkout-session')) {
-                return Promise.resolve({
-                    ok: true,
-                    json: async () => {
-                        return {
-                            publicKey: 'key-xyz'
-                        };
-                    }
-                });
-            }
+            // Payment-related API endpoints removed
             return Promise.resolve({});
         });
 
-        // Mock global Stripe
-        window.Stripe = () => {};
-        vi.spyOn(window, 'Stripe').mockImplementation(() => {
-            return {
-                redirectToCheckout: () => {
-                    return Promise.resolve({});
-                }
-            };
-        });
+        // Stripe mocking removed - payment functionality deprecated
 
         // Mock window.location
         let locationMock = vi.fn();
@@ -309,39 +290,5 @@ describe('Portal Data links:', () => {
         });
     });
 
-    describe('#/portal/account/newsletter/help', () => {
-        test('opens portal newsletter receiving help page', async () => {
-            window.location.hash = '#/portal/account/newsletters/help';
-            let {
-                popupFrame, triggerButtonFrame, ...utils
-            } = await setup({
-                site: FixtureSite.singleTier.basic,
-                member: FixtureMember.free,
-                showPopup: false
-            });
-            expect(triggerButtonFrame).toBeInTheDocument();
-            popupFrame = await utils.findByTitle(/portal-popup/i);
-            expect(popupFrame).toBeInTheDocument();
-            const helpPageTitle = within(popupFrame.contentDocument).queryByText(/help! i'm not receiving emails/i);
-            expect(helpPageTitle).toBeInTheDocument();
-        });
-    });
-
-    describe('#/portal/account/newsletter/disabled', () => {
-        test('opens portal newsletter receiving help page', async () => {
-            window.location.hash = '#/portal/account/newsletters/disabled';
-            let {
-                popupFrame, triggerButtonFrame, ...utils
-            } = await setup({
-                site: FixtureSite.singleTier.basic,
-                member: FixtureMember.free,
-                showPopup: false
-            });
-            expect(triggerButtonFrame).toBeInTheDocument();
-            popupFrame = await utils.findByTitle(/portal-popup/i);
-            expect(popupFrame).toBeInTheDocument();
-            const helpPageTitle = within(popupFrame.contentDocument).queryByText(/why has my email been disabled/i);
-            expect(helpPageTitle).toBeInTheDocument();
-        });
-    });
+    // Newsletter help page tests removed - functionality deprecated
 });

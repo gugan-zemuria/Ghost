@@ -4,7 +4,6 @@ const routeSettings = require('../../services/route-settings');
 const {BadRequestError} = require('@tryghost/errors');
 const settingsService = require('../../services/settings/settings-service');
 const membersService = require('../../services/members');
-const stripeService = require('../../services/stripe');
 const settingsBREADService = settingsService.getSettingsBREADServiceInstance();
 
 async function getStripeConnectData(frame) {
@@ -75,49 +74,6 @@ const controller = {
             const browse = await settingsBREADService.browse(frame.options.context);
 
             return browse;
-        }
-    },
-
-    disconnectStripeConnectIntegration: {
-        statusCode: 204,
-        headers: {
-            cacheInvalidate: false
-        },
-        permissions: {
-            method: 'edit'
-        },
-        async query(frame) {
-            const paidMembers = await membersService.api.memberBREADService.browse({limit: 0, filter: 'status:paid'});
-            if (_.get(paidMembers, 'meta.pagination.total') !== 0) {
-                throw new BadRequestError({
-                    message: 'Cannot disconnect Stripe whilst you have active subscriptions.'
-                });
-            }
-
-            await stripeService.disconnect();
-
-            return models.Settings.edit([{
-                key: 'stripe_connect_publishable_key',
-                value: null
-            }, {
-                key: 'stripe_connect_secret_key',
-                value: null
-            }, {
-                key: 'stripe_connect_livemode',
-                value: null
-            }, {
-                key: 'stripe_connect_display_name',
-                value: null
-            }, {
-                key: 'stripe_connect_account_id',
-                value: null
-            }, {
-                key: 'members_stripe_webhook_id',
-                value: null
-            }, {
-                key: 'members_stripe_webhook_secret',
-                value: null
-            }], frame.options);
         }
     },
 

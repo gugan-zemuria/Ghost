@@ -57,9 +57,7 @@ const Email = ghostBookshelf.Model.extend({
         return this.hasMany('EmailRecipient', 'email_id');
     },
 
-    newsletter() {
-        return this.belongsTo('Newsletter', 'newsletter_id');
-    },
+    // Newsletter relationship removed - payment functionality disabled
 
     emitChange: function emitChange(event, options) {
         const eventToTrigger = 'email' + '.' + event;

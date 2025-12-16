@@ -256,7 +256,7 @@ export default class MembersController extends Controller {
         let {label, paidParam, searchParam, filterParam} = params ? params : this;
 
         if (filterParam) {
-            // If the provided filter param is a single filter related to newsletter subscription status
+            // If the provided filter param is a single filter related to subscription status
             // remove the surrounding brackets to prevent https://github.com/TryGhost/NQL/issues/16
             const BRACKETS_SURROUNDED_RE = /^\(.*\)$/;
             const MULTIPLE_GROUPS_RE = /\).*\(/;

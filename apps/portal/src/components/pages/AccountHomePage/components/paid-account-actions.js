@@ -1,5 +1,5 @@
 import AppContext from '../../../../app-context';
-import {allowCompMemberUpgrade, getCompExpiry, getMemberSubscription, getMemberTierName, getUpdatedOfferPrice, hasMultipleProductsFeature, hasOnlyFreePlan, isComplimentaryMember, isPaidMember, isInThePast, subscriptionHasFreeTrial} from '../../../../utils/helpers';
+import {allowCompMemberUpgrade, getCompExpiry, getMemberSubscription, getMemberTierName, getUpdatedOfferPrice, hasMultipleProductsFeature, hasOnlyFreePlan, isPaidMember, isInThePast, subscriptionHasFreeTrial} from '../../../../utils/helpers';
 import {getDateString} from '../../../../utils/date-time';
 import {ReactComponent as LoaderIcon} from '../../../../images/icons/loader.svg';
 import {ReactComponent as OfferTagIcon} from '../../../../images/icons/offer-tag.svg';
@@ -138,7 +138,8 @@ const PaidAccountActions = () => {
     };
 
     const subscription = getMemberSubscription({member});
-    const isComplimentary = isComplimentaryMember({member});
+    // isComplimentary check removed - payment functionality deprecated
+    const isComplimentary = false;
     const isPaid = isPaidMember({member});
     const isCancelled = subscription?.cancel_at_period_end;
     if (subscription || isComplimentary) {

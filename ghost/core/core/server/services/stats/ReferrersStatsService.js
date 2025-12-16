@@ -224,17 +224,8 @@ class ReferrersStatsService {
      * @returns {Promise<PaidConversionsCountStatDate[]>}
      **/
     async fetchAllPaidConversionSources() {
-        const knex = this.knex;
-        const ninetyDaysAgo = moment.utc().subtract(90, 'days').startOf('day').utc().format('YYYY-MM-DD HH:mm:ss');
-        const rows = await knex('members_subscription_created_events')
-            .select(knex.raw(`DATE(created_at) as date`))
-            .select(knex.raw(`COUNT(*) as paid_conversions`))
-            .select(knex.raw(`referrer_source as source`))
-            .where('created_at', '>=', ninetyDaysAgo)
-            .groupBy('date', 'referrer_source')
-            .orderBy('date');
-
-        return rows;
+        // Payment features removed - return empty array for paid conversions
+        return [];
     }
 
     /**

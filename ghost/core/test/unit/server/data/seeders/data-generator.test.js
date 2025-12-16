@@ -4,8 +4,9 @@ const knex = require('knex').default;
 
 const importers = require('../../../../../core/server/data/seeders/importers');
 const ProductsImporter = importers.find(i => i.table === 'products');
-const StripeProductsImporter = importers.find(i => i.table === 'stripe_products');
-const StripePricesImporter = importers.find(i => i.table === 'stripe_prices');
+// Payment importers removed
+// const StripeProductsImporter = importers.find(i => i.table === 'stripe_products');
+// const StripePricesImporter = importers.find(i => i.table === 'stripe_prices');
 
 const generateEvents = require('../../../../../core/server/data/seeders/utils/event-generator');
 
@@ -163,40 +164,13 @@ describe('Importer', function () {
         products[0].name.should.eql('Free');
     });
 
-    it('Should import an item for each entry in an array', async function () {
-        const transaction = await db.transaction();
-        const productsImporter = new ProductsImporter(db, transaction);
-        await productsImporter.import();
-
-        const stripeProductsImporter = new StripeProductsImporter(db, transaction);
-        await stripeProductsImporter.import();
-        transaction.commit();
-
-        const results = await db.select('id').from('stripe_products');
-
-        results.length.should.eql(4);
+    // Payment-related tests skipped - Stripe importers removed
+    it.skip('Should import an item for each entry in an array', async function () {
+        // Test skipped - StripeProductsImporter removed
     });
 
-    it('Should update products to reference price ids', async function () {
-        const transaction = await db.transaction();
-        const productsImporter = new ProductsImporter(db, transaction);
-        await productsImporter.import();
-
-        const stripeProductsImporter = new StripeProductsImporter(db, transaction);
-        await stripeProductsImporter.import();
-
-        const stripePricesImporter = new StripePricesImporter(db, transaction);
-        await stripePricesImporter.import();
-
-        await productsImporter.finalise();
-        await stripeProductsImporter.finalise();
-        await stripePricesImporter.finalise();
-        transaction.commit();
-
-        const results = await db.select('id', 'name', 'monthly_price_id', 'yearly_price_id').from('products');
-
-        results.length.should.eql(4);
-        results[0].name.should.eql('Free');
+    it.skip('Should update products to reference price ids', async function () {
+        // Test skipped - Stripe importers and price_id columns removed
     });
 });
 

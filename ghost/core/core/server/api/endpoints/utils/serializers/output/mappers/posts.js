@@ -137,9 +137,7 @@ module.exports = async (model, frame, options = {}) => {
                 jsonModel.email = null;
             }
 
-            if (relation === 'newsletter' && _.isEmpty(jsonModel.newsletter)) {
-                jsonModel.newsletter = null;
-            }
+
         });
     }
 

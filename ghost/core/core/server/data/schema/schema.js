@@ -9,55 +9,7 @@
  * Long text = length 1,000,000,000
  */
 module.exports = {
-    newsletters: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        uuid: {type: 'string', maxlength: 36, nullable: false, unique: true, validations: {isUUID: true}},
-        name: {type: 'string', maxlength: 191, nullable: false, unique: true},
-        description: {type: 'string', maxlength: 2000, nullable: true},
-        feedback_enabled: {type: 'boolean', nullable: false, defaultTo: false},
-        slug: {type: 'string', maxlength: 191, nullable: false, unique: true},
-        sender_name: {type: 'string', maxlength: 191, nullable: true},
-        sender_email: {type: 'string', maxlength: 191, nullable: true},
-        sender_reply_to: {type: 'string', maxlength: 191, nullable: false, defaultTo: 'newsletter'},
-        status: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'active', validations: {isIn: [['active', 'archived']]}},
-        visibility: {
-            type: 'string',
-            maxlength: 50,
-            nullable: false,
-            defaultTo: 'members'
-        },
-        subscribe_on_signup: {type: 'boolean', nullable: false, defaultTo: true},
-        sort_order: {type: 'integer', nullable: false, unsigned: true, defaultTo: 0},
-        header_image: {type: 'string', maxlength: 2000, nullable: true},
-        show_header_icon: {type: 'boolean', nullable: false, defaultTo: true},
-        show_header_title: {type: 'boolean', nullable: false, defaultTo: true},
-        show_excerpt: {type: 'boolean', nullable: false, defaultTo: false},
-        title_font_category: {type: 'string', maxlength: 191, nullable: false, defaultTo: 'sans_serif', validations: {isIn: [['serif', 'sans_serif']]}},
-        title_alignment: {type: 'string', maxlength: 191, nullable: false, defaultTo: 'center', validations: {isIn: [['center', 'left']]}},
-        show_feature_image: {type: 'boolean', nullable: false, defaultTo: true},
-        body_font_category: {type: 'string', maxlength: 191, nullable: false, defaultTo: 'sans_serif', validations: {isIn: [['serif', 'sans_serif']]}},
-        footer_content: {type: 'text', maxlength: 1000000000, nullable: true},
-        show_badge: {type: 'boolean', nullable: false, defaultTo: true},
-        show_header_name: {type: 'boolean', nullable: false, defaultTo: true},
-        show_post_title_section: {type: 'boolean', nullable: false, defaultTo: true},
-        show_comment_cta: {type: 'boolean', nullable: false, defaultTo: true},
-        show_subscription_details: {type: 'boolean', nullable: false, defaultTo: false},
-        show_latest_posts: {type: 'boolean', nullable: false, defaultTo: false},
-        background_color: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'light'},
-        post_title_color: {type: 'string', maxlength: 50, nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true},
-        button_corners: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'rounded', validations: {isIn: [['square', 'rounded', 'pill']]}},
-        button_style: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'fill', validations: {isIn: [['fill', 'outline']]}},
-        title_font_weight: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'bold', validations: {isIn: [['normal', 'medium', 'semibold', 'bold']]}},
-        link_style: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'underline', validations: {isIn: [['underline', 'regular', 'bold']]}},
-        image_corners: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'square', validations: {isIn: [['square', 'rounded']]}},
-        header_background_color: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'transparent'},
-        section_title_color: {type: 'string', maxlength: 50, nullable: true},
-        divider_color: {type: 'string', maxlength: 50, nullable: true},
-        button_color: {type: 'string', maxlength: 50, nullable: true, defaultTo: 'accent'},
-        link_color: {type: 'string', maxlength: 50, nullable: true, defaultTo: 'accent'}
-    },
+    // Newsletter table removed - feature deprecated
     posts: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         uuid: {type: 'string', maxlength: 36, nullable: false, index: true, validations: {isUUID: true}},
@@ -94,7 +46,6 @@ module.exports = {
         codeinjection_foot: {type: 'text', maxlength: 65535, nullable: true},
         custom_template: {type: 'string', maxlength: 100, nullable: true},
         canonical_url: {type: 'text', maxlength: 2000, nullable: true},
-        newsletter_id: {type: 'string', maxlength: 24, nullable: true, references: 'newsletters.id'},
         show_title_and_feature_image: {type: 'boolean', nullable: false, defaultTo: true},
         '@@INDEXES@@': [
             ['type','status','updated_at']
@@ -441,7 +392,7 @@ module.exports = {
             ['email_disabled']
         ]
     },
-    // NOTE: this is the tiers table
+    // NOTE: this is the tiers table (simplified - payment features removed)
     products: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         name: {type: 'string', maxlength: 191, nullable: false},
@@ -456,7 +407,6 @@ module.exports = {
             defaultTo: 'none',
             validations: {isIn: [['public', 'none']]}
         },
-        trial_days: {type: 'integer', unsigned: true, nullable: false, defaultTo: 0},
         description: {type: 'string', maxlength: 191, nullable: true},
         type: {
             type: 'string',
@@ -467,34 +417,10 @@ module.exports = {
                 isIn: [['paid', 'free']]
             }
         },
-        currency: {type: 'string', maxlength: 50, nullable: true},
-        monthly_price: {type: 'integer', unsigned: true, nullable: true},
-        yearly_price: {type: 'integer', unsigned: true, nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true},
-        // To be removed in future
-        monthly_price_id: {type: 'string', maxlength: 24, nullable: true},
-        yearly_price_id: {type: 'string', maxlength: 24, nullable: true}
-    },
-    offers: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        // @deprecated: use a status enum with isIn validation, not an `active` boolean
-        active: {type: 'boolean', nullable: false, defaultTo: true},
-        name: {type: 'string', maxlength: 191, nullable: false, unique: true},
-        code: {type: 'string', maxlength: 191, nullable: false, unique: true},
-        product_id: {type: 'string', maxlength: 24, nullable: false, references: 'products.id'},
-        stripe_coupon_id: {type: 'string', maxlength: 255, nullable: true, unique: true},
-        interval: {type: 'string', maxlength: 50, nullable: false, validations: {isIn: [['month', 'year']]}},
-        currency: {type: 'string', maxlength: 50, nullable: true},
-        discount_type: {type: 'string', maxlength: 50, nullable: false, validations: {isIn: [['percent', 'amount', 'trial']]}},
-        discount_amount: {type: 'integer', nullable: false},
-        duration: {type: 'string', maxlength: 50, nullable: false, validations: {isIn: [['trial', 'once', 'repeating', 'forever']]}},
-        duration_in_months: {type: 'integer', nullable: true},
-        portal_title: {type: 'string', maxlength: 191, nullable: true},
-        portal_description: {type: 'string', maxlength: 2000, nullable: true},
         created_at: {type: 'dateTime', nullable: false},
         updated_at: {type: 'dateTime', nullable: true}
     },
+    // offers table removed - payment feature deprecated
     benefits: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         name: {type: 'string', maxlength: 191, nullable: false},
@@ -550,22 +476,8 @@ module.exports = {
         },
         batch_id: {type: 'string', maxlength: 24, nullable: true}
     },
-    members_cancel_events: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
-        from_plan: {type: 'string', maxlength: 255, nullable: false},
-        created_at: {type: 'dateTime', nullable: false}
-    },
-    members_payment_events: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
-        amount: {type: 'integer', nullable: false},
-        // @note: this is longer than originally intended due to a bug - https://github.com/TryGhost/Ghost/pull/15606
-        // so we should decide whether we should reduce it down in the future
-        currency: {type: 'string', maxlength: 191, nullable: false},
-        source: {type: 'string', maxlength: 50, nullable: false},
-        created_at: {type: 'dateTime', nullable: false}
-    },
+    // members_cancel_events table removed - payment feature deprecated
+    // members_payment_events table removed - payment feature deprecated
     members_login_events: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
@@ -604,24 +516,7 @@ module.exports = {
         },
         created_at: {type: 'dateTime', nullable: false}
     },
-    members_paid_subscription_events: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        type: {type: 'string', maxlength: 50, nullable: true},
-        member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
-        subscription_id: {type: 'string', maxlength: 24, nullable: true},
-        from_plan: {type: 'string', maxlength: 255, nullable: true},
-        to_plan: {type: 'string', maxlength: 255, nullable: true},
-        // @note: this is longer than originally intended due to a bug - https://github.com/TryGhost/Ghost/pull/15606
-        // so we should decide whether we should reduce it down in the future
-        currency: {type: 'string', maxlength: 191, nullable: false},
-        source: {
-            type: 'string', maxlength: 50, nullable: false, validations: {
-                isIn: [['stripe']]
-            }
-        },
-        mrr_delta: {type: 'integer', nullable: false},
-        created_at: {type: 'dateTime', nullable: false}
-    },
+    // members_paid_subscription_events table removed - payment feature deprecated
     labels: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         name: {type: 'string', maxlength: 191, nullable: false, unique: true},
@@ -635,111 +530,12 @@ module.exports = {
         label_id: {type: 'string', maxlength: 24, nullable: false, references: 'labels.id', cascadeDelete: true},
         sort_order: {type: 'integer', nullable: false, unsigned: true, defaultTo: 0}
     },
-    members_stripe_customers: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        member_id: {type: 'string', maxlength: 24, nullable: false, unique: false, references: 'members.id', cascadeDelete: true},
-        customer_id: {type: 'string', maxlength: 255, nullable: false, unique: true},
-        name: {type: 'string', maxlength: 191, nullable: true},
-        email: {type: 'string', maxlength: 191, nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true}
-    },
-    subscriptions: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        type: {
-            type: 'string', maxlength: 50, nullable: false, validations: {
-                isIn: [['free', 'comped', 'paid']]
-            }
-        },
-        status: {
-            type: 'string', maxlength: 50, nullable: false, validations: {
-                isIn: [['active', 'expired', 'canceled']]
-            }
-        },
-        member_id: {type: 'string', maxlength: 24, nullable: false, unique: false, references: 'members.id', cascadeDelete: true},
-        tier_id: {type: 'string', maxlength: 24, nullable: false, unique: false, references: 'products.id'},
-
-        // These are null if type !== 'paid'
-        cadence: {
-            type: 'string', maxlength: 50, nullable: true, validations: {
-                isIn: [['month', 'year']]
-            }
-        },
-        currency: {type: 'string', maxlength: 50, nullable: true},
-        amount: {type: 'integer', nullable: true},
-
-        // e.g. 'stripe'
-        payment_provider: {type: 'string', maxlength: 50, nullable: true},
-        // e.g. Stripe Subscription Link
-        payment_subscription_url: {type: 'string', maxlength: 2000, nullable: true},
-        // e.g. Stripe Customer Link
-        payment_user_url: {type: 'string', maxlength: 2000, nullable: true},
-
-        offer_id: {type: 'string', maxlength: 24, nullable: true, unique: false, references: 'offers.id'},
-
-        expires_at: {type: 'dateTime', nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true}
-    },
-    members_stripe_customers_subscriptions: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        customer_id: {type: 'string', maxlength: 255, nullable: false, unique: false, references: 'members_stripe_customers.customer_id', cascadeDelete: true},
-        ghost_subscription_id: {type: 'string', maxlength: 24, nullable: true, references: 'subscriptions.id', constraintName: 'mscs_ghost_subscription_id_foreign', cascadeDelete: true},
-        subscription_id: {type: 'string', maxlength: 255, nullable: false, unique: true},
-        stripe_price_id: {type: 'string', maxlength: 255, nullable: false, unique: false, index: true, defaultTo: ''},
-        status: {type: 'string', maxlength: 50, nullable: false},
-        cancel_at_period_end: {type: 'boolean', nullable: false, defaultTo: false},
-        cancellation_reason: {type: 'string', maxlength: 500, nullable: true},
-        current_period_end: {type: 'dateTime', nullable: false},
-        start_date: {type: 'dateTime', nullable: false},
-        default_payment_card_last4: {type: 'string', maxlength: 4, nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true},
-        mrr: {type: 'integer', unsigned: true, nullable: false, defaultTo: 0},
-        offer_id: {type: 'string', maxlength: 24, nullable: true, unique: false, references: 'offers.id'},
-        trial_start_at: {type: 'dateTime', nullable: true},
-        trial_end_at: {type: 'dateTime', nullable: true},
-        /* Below fields are now redundant as we link stripe_price_id to stripe_prices table */
-        plan_id: {type: 'string', maxlength: 255, nullable: false, unique: false},
-        plan_nickname: {type: 'string', maxlength: 50, nullable: false},
-        plan_interval: {type: 'string', maxlength: 50, nullable: false},
-        plan_amount: {type: 'integer', nullable: false},
-        // @note: this is longer than originally intended due to a bug - https://github.com/TryGhost/Ghost/pull/15606
-        // so we should decide whether we should reduce it down in the future
-        plan_currency: {type: 'string', maxlength: 191, nullable: false}
-    },
-    members_subscription_created_events: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        created_at: {type: 'dateTime', nullable: false},
-        member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
-        subscription_id: {type: 'string', maxlength: 24, nullable: false, references: 'members_stripe_customers_subscriptions.id', cascadeDelete: true},
-        // attribution values from ghost-history (member attribution tracking script)
-        attribution_id: {type: 'string', maxlength: 24, nullable: true, index: true},
-        attribution_type: {
-            type: 'string', maxlength: 50, nullable: true, validations: {
-                isIn: [['url', 'post', 'page', 'author', 'tag']]
-            }
-        },
-        attribution_url: {type: 'string', maxlength: 2000, nullable: true},
-        // referrer values from browser, processed by our referrerParser library
-        referrer_source: {type: 'string', maxlength: 191, nullable: true},
-        referrer_medium: {type: 'string', maxlength: 191, nullable: true},
-        referrer_url: {type: 'string', maxlength: 2000, nullable: true},
-        // raw values from URL query parameters
-        utm_source: {type: 'string', maxlength: 191, nullable: true},
-        utm_medium: {type: 'string', maxlength: 191, nullable: true},
-        utm_campaign: {type: 'string', maxlength: 191, nullable: true},
-        utm_term: {type: 'string', maxlength: 191, nullable: true},
-        utm_content: {type: 'string', maxlength: 191, nullable: true},
-        batch_id: {type: 'string', maxlength: 24, nullable: true}
-    },
-    offer_redemptions: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        offer_id: {type: 'string', maxlength: 24, nullable: false, references: 'offers.id', cascadeDelete: true},
-        member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
-        subscription_id: {type: 'string', maxlength: 24, nullable: false, references: 'members_stripe_customers_subscriptions.id', cascadeDelete: true},
-        created_at: {type: 'dateTime', nullable: false}
-    },
+    // Payment tables removed - payment feature deprecated
+    // members_stripe_customers table removed
+    // subscriptions table removed
+    // members_stripe_customers_subscriptions table removed
+    // members_subscription_created_events table removed
+    // offer_redemptions table removed
     members_subscribe_events: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         member_id: {type: 'string', maxlength: 24, nullable: false, unique: false, references: 'members.id', cascadeDelete: true},
@@ -750,62 +546,13 @@ module.exports = {
                 isIn: [['member', 'import', 'system', 'api', 'admin']]
             }
         },
-        newsletter_id: {type: 'string', maxlength: 24, nullable: true, references: 'newsletters.id', cascadeDelete: false},
         '@@INDEXES@@': [
-            ['newsletter_id', 'created_at']
+            ['created_at']
         ]
     },
-    donation_payment_events: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        name: {type: 'string', maxlength: 191, nullable: true},
-        email: {type: 'string', maxlength: 191, nullable: false, unique: false, validations: {isEmail: true}},
-        member_id: {type: 'string', maxlength: 24, nullable: true, unique: false, references: 'members.id', setNullDelete: true},
-        amount: {type: 'integer', nullable: false},
-        currency: {type: 'string', maxlength: 50, nullable: false},
-        // attribution values from ghost-history (member attribution tracking script)
-        attribution_id: {type: 'string', maxlength: 24, nullable: true},
-        attribution_type: {
-            type: 'string', maxlength: 50, nullable: true, validations: {
-                isIn: [['url', 'post', 'page', 'author', 'tag']]
-            }
-        },
-        attribution_url: {type: 'string', maxlength: 2000, nullable: true},
-        // referrer values from browser, processed by our referrerParser library
-        referrer_source: {type: 'string', maxlength: 191, nullable: true},
-        referrer_medium: {type: 'string', maxlength: 191, nullable: true},
-        referrer_url: {type: 'string', maxlength: 2000, nullable: true},
-        // raw values from URL query parameters
-        utm_source: {type: 'string', maxlength: 191, nullable: true},
-        utm_medium: {type: 'string', maxlength: 191, nullable: true},
-        utm_campaign: {type: 'string', maxlength: 191, nullable: true},
-        utm_term: {type: 'string', maxlength: 191, nullable: true},
-        utm_content: {type: 'string', maxlength: 191, nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        donation_message: {type: 'string', maxlength: 255, nullable: true} // https://docs.stripe.com/payments/checkout/custom-fields
-    },
-    stripe_products: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        product_id: {type: 'string', maxlength: 24, nullable: true, unique: false, references: 'products.id'},
-        stripe_product_id: {type: 'string', maxlength: 255, nullable: false, unique: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true}
-    },
-    stripe_prices: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        stripe_price_id: {type: 'string', maxlength: 255, nullable: false, unique: true},
-        stripe_product_id: {type: 'string', maxlength: 255, nullable: false, unique: false, references: 'stripe_products.stripe_product_id'},
-        active: {type: 'boolean', nullable: false},
-        nickname: {type: 'string', maxlength: 255, nullable: true},
-        // @note: this is longer than originally intended due to a bug - https://github.com/TryGhost/Ghost/pull/15606
-        // so we should decide whether we should reduce it down in the future
-        currency: {type: 'string', maxlength: 191, nullable: false},
-        amount: {type: 'integer', nullable: false},
-        type: {type: 'string', maxlength: 50, nullable: false, defaultTo: 'recurring', validations: {isIn: [['recurring', 'one_time', 'donation']]}},
-        interval: {type: 'string', maxlength: 50, nullable: true},
-        description: {type: 'string', maxlength: 191, nullable: true},
-        created_at: {type: 'dateTime', nullable: false},
-        updated_at: {type: 'dateTime', nullable: true}
-    },
+    // donation_payment_events table removed - payment feature deprecated
+    // stripe_products table removed - payment feature deprecated
+    // stripe_prices table removed - payment feature deprecated
     actions: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         resource_id: {type: 'string', maxlength: 24, nullable: true},
@@ -859,7 +606,6 @@ module.exports = {
         track_clicks: {type: 'boolean', nullable: false, defaultTo: false},
         feedback_enabled: {type: 'boolean', nullable: false, defaultTo: false},
         submitted_at: {type: 'dateTime', nullable: false},
-        newsletter_id: {type: 'string', maxlength: 24, nullable: true, references: 'newsletters.id'},
         created_at: {type: 'dateTime', nullable: false},
         updated_at: {type: 'dateTime', nullable: true}
     },
@@ -958,14 +704,7 @@ module.exports = {
         },
         value: {type: 'text', maxlength: 65535, nullable: true}
     },
-    members_newsletters: {
-        id: {type: 'string', maxlength: 24, nullable: false, primary: true},
-        member_id: {type: 'string', maxlength: 24, nullable: false, references: 'members.id', cascadeDelete: true},
-        newsletter_id: {type: 'string', maxlength: 24, nullable: false, references: 'newsletters.id', cascadeDelete: true},
-        '@@INDEXES@@': [
-            ['newsletter_id', 'member_id']
-        ]
-    },
+    // members_newsletters table removed - newsletter feature deprecated
     comments: {
         id: {type: 'string', maxlength: 24, nullable: false, primary: true},
         post_id: {type: 'string', maxlength: 24, nullable: false, unique: false, references: 'posts.id', cascadeDelete: true},

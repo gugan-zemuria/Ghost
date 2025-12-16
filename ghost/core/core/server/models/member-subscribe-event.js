@@ -8,9 +8,7 @@ const MemberSubscribeEvent = ghostBookshelf.Model.extend({
         return this.belongsTo('Member', 'member_id', 'id');
     },
 
-    newsletter() {
-        return this.belongsTo('Newsletter', 'newsletter_id', 'id');
-    },
+    // Newsletter relationship removed - payment functionality disabled
 
     customQuery(qb, options) {
         if (options.aggregateSubscriptionDeltas) {

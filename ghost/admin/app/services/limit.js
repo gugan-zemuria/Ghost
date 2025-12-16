@@ -80,9 +80,7 @@ export default class LimitsService extends Service {
             limits.members.currentCountQuery = bind(this, this.getMembersCount);
         }
 
-        if (limits.newsletters) {
-            limits.newsletters.currentCountQuery = bind(this, this.getNewslettersCount);
-        }
+        // Newsletter feature removed
 
         return limits;
     }
@@ -104,8 +102,5 @@ export default class LimitsService extends Service {
         return this.membersCountCache.count({});
     }
 
-    async getNewslettersCount() {
-        const activeNewsletters = await this.store.query('newsletter', {filter: 'status:active', limit: 'all'});
-        return activeNewsletters.length;
-    }
+    // Newsletter feature removed
 }

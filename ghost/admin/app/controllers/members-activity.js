@@ -1,6 +1,6 @@
 import Controller from '@ember/controller';
 import MemberFetcher from 'ghost-admin/helpers/member-fetcher';
-import {EMAIL_EVENTS, NEWSLETTER_EVENTS} from 'ghost-admin/helpers/members-event-filter';
+import {EMAIL_EVENTS} from 'ghost-admin/helpers/members-event-filter';
 import {action} from '@ember/object';
 import {inject as service} from '@ember/service';
 import {tracked} from '@glimmer/tracking';
@@ -21,7 +21,7 @@ export default class MembersActivityController extends Controller {
 
     // we don't want to show or allow filtering of certain events in some situations
     // - no member selected = don't show email events, they flood the list and the API can't paginate correctly
-    // - newsletter is disabled = don't show email or newletter events
+    // - newsletter is disabled = don't show email events
     get hiddenEvents() {
         const hiddenEvents = [];
 
@@ -31,7 +31,7 @@ export default class MembersActivityController extends Controller {
         hiddenEvents.push('aggregated_click_event');
 
         if (this.settings.editorDefaultEmailRecipients === 'disabled') {
-            hiddenEvents.push(...EMAIL_EVENTS, ...NEWSLETTER_EVENTS);
+            hiddenEvents.push(...EMAIL_EVENTS);
         }
 
         return hiddenEvents;

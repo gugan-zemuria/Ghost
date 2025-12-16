@@ -50,7 +50,7 @@ class PostsExporter {
             ]
         });
 
-        const newsletters = (await this.#models.Newsletter.findAll()).models;
+        // Newsletter feature removed
         const labels = (await this.#models.Label.findAll()).models;
         const tiers = (await this.#models.Product.findAll()).models;
 

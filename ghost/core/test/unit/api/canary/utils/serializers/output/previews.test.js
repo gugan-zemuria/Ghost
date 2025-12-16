@@ -3,7 +3,6 @@ const sinon = require('sinon');
 const testUtils = require('../../../../../../utils');
 const mappers = require('../../../../../../../core/server/api/endpoints/utils/serializers/output/mappers');
 const serializers = require('../../../../../../../core/server/api/endpoints/utils/serializers');
-const tiersService = require('../../../../../../../core/server/services/tiers');
 
 describe('Unit: endpoints/utils/serializers/output/previews', function () {
     let pageModel;
@@ -13,18 +12,11 @@ describe('Unit: endpoints/utils/serializers/output/previews', function () {
             return Object.assign(data, {toJSON: sinon.stub().returns(data), get: key => (key === 'type' ? 'page' : '')});
         };
 
-        tiersService.api = {
-            browse() {
-                return {data: null};
-            }
-        };
-
         sinon.stub(mappers, 'posts').returns({});
     });
 
     afterEach(function () {
         sinon.restore();
-        tiersService.api = null;
     });
 
     it('calls the mapper', async function () {

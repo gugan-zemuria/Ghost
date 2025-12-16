@@ -15,7 +15,6 @@ module.exports = {
     snippets: require('./snippets'),
     tags: require('./tags'),
     offers: require('./offers'),
-    newsletters: require('./newsletters'),
     users: require('./users'),
     mentions: require('./mentions')
 };

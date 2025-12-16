@@ -13,7 +13,7 @@ export default class Debug extends AuthenticatedRoute {
                 'authors.roles',
                 'email',
                 'tiers',
-                'newsletter'
+                // Newsletter feature removed
             ].join(',')
         };
 

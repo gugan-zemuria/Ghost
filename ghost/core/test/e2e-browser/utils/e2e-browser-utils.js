@@ -1,14 +1,12 @@
 const DataGenerator = require('../../utils/fixtures/data-generator');
 const {expect, test} = require('@playwright/test');
 const ObjectID = require('bson-objectid').default;
-const Stripe = require('stripe').Stripe;
+// Stripe import removed - payment functionality deprecated
 
 /**
- * Tier
+ * Tier - simplified for free-only system
  * @typedef {object} Tier
  * @property {string} tier.name
- * @property {number} tier.monthlyPrice
- * @property {number} tier.yearlyPrice
  */
 
 /**

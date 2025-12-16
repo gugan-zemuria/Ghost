@@ -22,23 +22,17 @@ const settingsCache = require('../../core/shared/settings-cache');
 const limitService = require('../../core/server/services/limits');
 const dns = require('dns');
 const dnsPromises = dns.promises;
-const StripeMocker = require('./stripe-mocker');
 
 let fakedLabsFlags = {};
 let allowedNetworkDomains = [];
 const originalLabsIsSet = labs.isSet;
-const stripeMocker = new StripeMocker();
 
 /**
- * Stripe Mocks
+ * Stripe Mocks - REMOVED (Payment feature removed)
  */
 
 const disableStripe = async () => {
-    // This must be required _after_ startGhost has been called, because the models will
-    // not have been loaded otherwise. Consider moving the dependency injection of models
-    // into the init method of the Stripe service.
-    const stripeService = require('../../core/server/services/stripe');
-    await stripeService.disconnect();
+    // Stripe service has been removed - this is now a no-op
 };
 
 const disableNetwork = () => {
@@ -75,8 +69,8 @@ const disableNetwork = () => {
 };
 
 const allowStripe = () => {
+    // Stripe service has been removed - this is now a no-op
     disableNetwork();
-    allowedNetworkDomains.push('stripe.com');
 };
 
 const mockGeojs = () => {
@@ -99,9 +93,8 @@ const mockGeojs = () => {
 };
 
 const mockStripe = () => {
+    // Stripe service has been removed - this is now a no-op
     disableNetwork();
-    stripeMocker.reset();
-    stripeMocker.stub();
 };
 
 const mockSlack = () => {
@@ -359,7 +352,6 @@ const restore = () => {
     allowedNetworkDomains = [];
     nock.cleanAll();
     nock.enableNetConnect();
-    stripeMocker.reset();
 
     if (mocks.webhookMockReceiver) {
         mocks.webhookMockReceiver.reset();
@@ -388,7 +380,6 @@ module.exports = {
     restoreLimitService,
     disableNetwork,
     restore,
-    stripeMocker,
     assert: {
         sentEmail,
         emittedEvent

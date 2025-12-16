@@ -4,26 +4,11 @@ const models = require('../../../../../core/server/models');
 
 const serialize = require('../../../../../core/server/services/webhooks/serialize');
 
-// Mocked internals
-const tiersService = require('../../../../../core/server/services/tiers');
-
 const {fixtureManager} = require('../../../../utils/e2e-framework');
 
 describe('WebhookService - Serialize', function () {
     before(function () {
         models.init();
-    });
-
-    beforeEach(function () {
-        tiersService.api = {
-            browse() {
-                return {};
-            }
-        };
-    });
-
-    afterEach(function () {
-        tiersService.api = null;
     });
 
     it('rejects with no arguments', async function () {

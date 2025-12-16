@@ -185,7 +185,8 @@ describe('Unit: utils/serializers/output/mappers', function () {
         });
     });
 
-    describe('Newsletter Mapper', function () {
+    describe.skip('Newsletter Mapper', function () {
+        // Newsletter feature removed
         it('returns only allowed keys for content API', function () {
             const frame = {
                 apiType: 'content'

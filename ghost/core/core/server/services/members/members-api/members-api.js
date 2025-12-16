@@ -3,7 +3,6 @@ const body = require('body-parser');
 const errors = require('@tryghost/errors');
 const logging = require('@tryghost/logging');
 
-const PaymentsService = require('./services/PaymentsService');
 const TokenService = require('./services/TokenService');
 const GeolocationService = require('./services/GeolocationService');
 const MemberBREADService = require('./services/MemberBREADService');
@@ -36,39 +35,23 @@ module.exports = function MembersAPI({
         getSubject
     },
     models: {
-        DonationPaymentEvent,
         EmailRecipient,
-        StripeCustomer,
-        StripeCustomerSubscription,
         Member,
-        MemberNewsletter,
-        MemberCancelEvent,
         MemberSubscribeEvent,
         MemberLoginEvent,
-        MemberPaidSubscriptionEvent,
-        MemberPaymentEvent,
         MemberStatusEvent,
         MemberProductEvent,
         MemberEmailChangeEvent,
         MemberCreatedEvent,
-        SubscriptionCreatedEvent,
         MemberLinkClickEvent,
         EmailSpamComplaintEvent,
-        Offer,
-        OfferRedemption,
-        StripeProduct,
-        StripePrice,
         Product,
         Settings,
         Comment,
         MemberFeedback,
         Outbox
     },
-    tiersService,
-    stripeAPIService,
-    offersAPI,
     labsService,
-    newslettersService,
     memberAttributionService,
     emailSuppressionList,
     settingsCache,
@@ -84,43 +67,27 @@ module.exports = function MembersAPI({
 
     const productRepository = new ProductRepository({
         Product,
-        Settings,
-        StripeProduct,
-        StripePrice,
-        stripeAPIService
+        Settings
     });
 
     const memberRepository = new MemberRepository({
-        stripeAPIService,
         tokenService,
-        newslettersService,
         labsService,
         productRepository,
         Member,
-        MemberNewsletter,
-        MemberCancelEvent,
         MemberSubscribeEventModel: MemberSubscribeEvent,
-        MemberPaidSubscriptionEvent,
         MemberEmailChangeEvent,
         MemberStatusEvent,
         MemberProductEvent,
-        OfferRedemption,
-        StripeCustomer,
-        StripeCustomerSubscription,
-        Outbox,
-        offerRepository: offersAPI.repository
+        Outbox
     });
 
     const eventRepository = new EventRepository({
-        DonationPaymentEvent,
         EmailRecipient,
         MemberSubscribeEvent,
-        MemberPaidSubscriptionEvent,
-        MemberPaymentEvent,
         MemberStatusEvent,
         MemberLoginEvent,
         MemberCreatedEvent,
-        SubscriptionCreatedEvent,
         MemberLinkClickEvent,
         MemberFeedback,
         EmailSpamComplaintEvent,
@@ -131,13 +98,13 @@ module.exports = function MembersAPI({
     });
 
     const memberBREADService = new MemberBREADService({
-        offersAPI,
         memberRepository,
         emailService: {
             async sendEmailWithMagicLink({email, requestedType}) {
                 return sendEmailWithMagicLink({
                     email,
                     requestedType,
+                    tokenData: {},
                     options: {
                         forceEmailType: true
                     }
@@ -145,7 +112,6 @@ module.exports = function MembersAPI({
             }
         },
         labsService,
-        stripeService: stripeAPIService,
         memberAttributionService,
         emailSuppressionList,
         settingsHelpers
@@ -164,41 +130,22 @@ module.exports = function MembersAPI({
         labsService
     });
 
-    const paymentsService = new PaymentsService({
-        StripeProduct,
-        StripePrice,
-        StripeCustomer,
-        Offer,
-        offersAPI,
-        stripeAPIService,
-        settingsCache
-    });
-
     const memberController = new MemberController({
         memberRepository,
         productRepository,
-        paymentsService,
-        tiersService,
-        StripePrice,
         tokenService,
         sendEmailWithMagicLink,
         settingsCache
     });
 
     const routerController = new RouterController({
-        offersAPI,
-        paymentsService,
-        tiersService,
         memberRepository,
-        StripePrice,
         allowSelfSignup,
         magicLinkService,
-        stripeAPIService,
         tokenService,
         sendEmailWithMagicLink,
         memberAttributionService,
         labsService,
-        newslettersService,
         settingsCache,
         sentry,
         urlUtils
@@ -242,7 +189,7 @@ module.exports = function MembersAPI({
     }
 
     async function getMemberDataFromMagicLinkToken(token, otcVerification) {
-        const {email, labels = [], name = '', oldEmail, newsletters, attribution, reqIp, type} = await getTokenDataFromMagicLinkToken(token, otcVerification);
+        const {email, labels = [], name = '', oldEmail, attribution, reqIp, type} = await getTokenDataFromMagicLinkToken(token, otcVerification);
         if (!email) {
             return null;
         }
@@ -277,7 +224,7 @@ module.exports = function MembersAPI({
             }
         }
 
-        const newMember = await users.create({name, email, labels, newsletters, attribution, geolocation});
+        const newMember = await users.create({name, email, labels, attribution, geolocation});
 
         await MemberLoginEvent.add({member_id: newMember.id});
         return getMemberIdentityData(email);
@@ -346,21 +293,9 @@ module.exports = function MembersAPI({
             body.json(),
             forwardError((req, res) => routerController.verifyOTC(req, res))
         ),
-        createCheckoutSession: Router().use(
-            body.json(),
-            forwardError((req, res) => routerController.createCheckoutSession(req, res))
-        ),
-        createCheckoutSetupSession: Router().use(
-            body.json(),
-            forwardError((req, res) => routerController.createCheckoutSetupSession(req, res))
-        ),
         updateEmailAddress: Router().use(
             body.json(),
             forwardError((req, res) => memberController.updateEmailAddress(req, res))
-        ),
-        updateSubscription: Router({mergeParams: true}).use(
-            body.json(),
-            forwardError((req, res) => memberController.updateSubscription(req, res))
         ),
         wellKnown: Router()
             .get('/jwks.json',
@@ -405,7 +340,6 @@ module.exports = function MembersAPI({
         productRepository,
 
         // Test helpers
-        getTokenDataFromMagicLinkToken,
-        paymentsService
+        getTokenDataFromMagicLinkToken
     };
 };

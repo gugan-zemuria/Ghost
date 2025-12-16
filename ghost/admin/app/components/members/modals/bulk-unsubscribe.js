@@ -23,29 +23,13 @@ export default class BulkUnsubscribeMembersModal extends Component {
     }
 
     get hasMultipleNewsletters() {
-        const newsletters = this.store.peekAll('newsletter');
-        const activeNewsletters = newsletters.filter(newsletter => newsletter.status !== 'archived');
-        if (activeNewsletters.length <= 1) {
-            return false;
-        } else {
-            return true;
-        }
+        // Newsletter feature removed
+        return false;
     }
 
     get newsletterList() {
-        const newsletters = this.store.peekAll('newsletter');
-        const activeNewsletters = newsletters.filter(newsletter => newsletter.status !== 'archived');
-        let list = [{
-            name: 'All newsletters',
-            value: 'all'
-        }];
-        activeNewsletters.forEach((newsletter) => {
-            list.push({
-                name: newsletter.name,
-                value: newsletter.id
-            });
-        });
-        return list;
+        // Newsletter feature removed
+        return [];
     }
 
     @action
@@ -64,30 +48,8 @@ export default class BulkUnsubscribeMembersModal extends Component {
 
     @task({drop: true})
     *bulkUnsubscribeTask() {
-        try {
-            let args = this.args.data.query;
-            const query = new URLSearchParams(args);
-            const removeLabelUrl = `${this.ghostPaths.url.api('members/bulk')}?${query}`;
-            const response = yield this.ajax.put(removeLabelUrl, {data: {
-                bulk: {
-                    action: 'unsubscribe',
-                    newsletter: (this.selectedNewsletterId ? this.selectedNewsletterId : null),
-                    meta: {}
-                }
-            }});
-
-            this.args.data.onComplete?.();
-            
-            this.response = response?.bulk?.meta;
-
-            return true;
-        } catch (e) {
-            if (e.payload?.errors) {
-                this.error = e.payload.errors[0].message;
-            } else {
-                this.error = 'An unknown error occurred. Please try again.';
-            }
-            throw e;
-        }
+        // Newsletter feature removed - this action is no longer available
+        this.error = 'Newsletter functionality has been removed.';
+        return false;
     }
 }

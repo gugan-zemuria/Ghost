@@ -14,7 +14,7 @@ import {transformPortalAnchorToRelative} from './utils/transform-portal-anchor-t
 import {getActivePage, isAccountPage, isOfferPage} from './pages';
 import ActionHandler from './actions';
 import './app.css';
-import {hasRecommendations, allowCompMemberUpgrade, createPopupNotification, hasAvailablePrices, getCurrencySymbol, getFirstpromoterId, getPriceIdFromPageQuery, getProductCadenceFromPrice, getProductFromId, getQueryPrice, getSiteDomain, isActiveOffer, isComplimentaryMember, isInviteOnly, isPaidMember, isRecentMember, isSentryEventAllowed, removePortalLinkFromUrl} from './utils/helpers';
+import {hasRecommendations, createPopupNotification, getSiteDomain, isInviteOnly, isRecentMember, isSentryEventAllowed, removePortalLinkFromUrl, isPaidMember, getPriceIdFromPageQuery, getProductFromId, isActiveOffer, getProductCadenceFromPrice, getQueryPrice} from './utils/helpers';
 import {handleDataAttributes} from './data-attributes';
 
 const DEV_MODE_DATA = {
@@ -298,47 +298,7 @@ export default class App extends React.Component {
         return {};
     }
 
-    /**Fetch state from Offer Preview mode query string*/
-    fetchOfferQueryStrData(qs = '') {
-        const qsParams = new URLSearchParams(qs);
-        const data = {};
-        // Handle the query params key/value pairs
-        for (let pair of qsParams.entries()) {
-            const key = pair[0];
-            const value = decodeURIComponent(pair[1]);
-            if (key === 'name') {
-                data.name = value || '';
-            } else if (key === 'code') {
-                data.code = value || '';
-            } else if (key === 'display_title') {
-                data.display_title = value || '';
-            } else if (key === 'display_description') {
-                data.display_description = value || '';
-            } else if (key === 'type') {
-                data.type = value || '';
-            } else if (key === 'cadence') {
-                data.cadence = value || '';
-            } else if (key === 'duration') {
-                data.duration = value || '';
-            } else if (key === 'duration_in_months' && !isNaN(Number(value))) {
-                data.duration_in_months = Number(value);
-            } else if (key === 'amount' && !isNaN(Number(value))) {
-                data.amount = Number(value);
-            } else if (key === 'currency') {
-                data.currency = value || '';
-            } else if (key === 'status') {
-                data.status = value || '';
-            } else if (key === 'tier_id') {
-                data.tier = {
-                    id: value || Fixtures.offer.tier.id
-                };
-            }
-        }
-        return {
-            page: 'offer',
-            pageData: data
-        };
-    }
+    // Offer functionality removed - no longer needed without payment features
 
     /** Fetch state from Preview mode Query String */
     fetchQueryStrData(qs = '') {
@@ -349,10 +309,8 @@ export default class App extends React.Component {
             }
         };
 
-        const allowedPlans = [];
-        let portalPrices;
-        let portalProducts = null;
-        let monthlyPrice, yearlyPrice, currency;
+        const allowedPlans = ['free']; // Only free plan available
+        // Payment-related variables removed
         // Handle the query params key/value pairs
         for (let pair of qsParams.entries()) {
             const key = pair[0];
@@ -368,12 +326,7 @@ export default class App extends React.Component {
                 allowedPlans.push('free');
             } else if (key === 'isMonthly' && JSON.parse(value)) {
                 allowedPlans.push('monthly');
-            } else if (key === 'isYearly' && JSON.parse(value)) {
-                allowedPlans.push('yearly');
-            } else if (key === 'portalPrices') {
-                portalPrices = value ? value.split(',') : [];
-            } else if (key === 'portalProducts') {
-                portalProducts = value ? value.split(',') : [];
+            // Payment-related portal parameters removed
             } else if (key === 'page' && value) {
                 data.page = value;
             } else if (key === 'accentColor' && (value === '' || value)) {
@@ -388,17 +341,7 @@ export default class App extends React.Component {
                 data.site.portal_signup_checkbox_required = JSON.parse(value);
             } else if (key === 'buttonStyle' && value) {
                 data.site.portal_button_style = value;
-            } else if (key === 'monthlyPrice' && !isNaN(Number(value))) {
-                data.site.plans.monthly = Number(value);
-                monthlyPrice = Number(value);
-            } else if (key === 'yearlyPrice' && !isNaN(Number(value))) {
-                data.site.plans.yearly = Number(value);
-                yearlyPrice = Number(value);
-            } else if (key === 'currency' && value) {
-                const currencyValue = value.toUpperCase();
-                data.site.plans.currency = currencyValue;
-                data.site.plans.currency_symbol = getCurrencySymbol(currencyValue);
-                currency = currencyValue;
+            // Payment-related query parameters removed
             } else if (key === 'disableBackground') {
                 data.site.disableBackground = JSON.parse(value);
             } else if (key === 'membersSignupAccess' && value) {
@@ -407,36 +350,9 @@ export default class App extends React.Component {
                 data.site.portal_default_plan = value;
             }
         }
-        data.site.portal_plans = allowedPlans;
-        data.site.portal_products = portalProducts;
-        if (portalPrices) {
-            data.site.portal_plans = portalPrices;
-        } else if (monthlyPrice && yearlyPrice && currency) {
-            data.site.prices = [
-                {
-                    id: 'monthly',
-                    stripe_price_id: 'dummy_stripe_monthly',
-                    stripe_product_id: 'dummy_stripe_product',
-                    active: 1,
-                    nickname: 'Monthly',
-                    currency: currency,
-                    amount: monthlyPrice,
-                    type: 'recurring',
-                    interval: 'month'
-                },
-                {
-                    id: 'yearly',
-                    stripe_price_id: 'dummy_stripe_yearly',
-                    stripe_product_id: 'dummy_stripe_product',
-                    active: 1,
-                    nickname: 'Yearly',
-                    currency: currency,
-                    amount: yearlyPrice,
-                    type: 'recurring',
-                    interval: 'year'
-                }
-            ];
-        }
+        data.site.portal_plans = ['free']; // Only free plan available
+        data.site.portal_products = []; // No paid products
+        // Payment-related price data removed
 
         return data;
     }
@@ -465,30 +381,12 @@ export default class App extends React.Component {
     /** Fetch state from Portal Links */
     fetchLinkData(site, member) {
         const qParams = new URLSearchParams(window.location.search);
+        // Newsletter unsubscribe functionality removed - redirecting to account page
         if (qParams.get('action') === 'unsubscribe') {
-            // if the user is unsubscribing from a newsletter with an old unsubscribe link that we can't validate, push them to newsletter mgmt where they have to log in
-            if (qParams.get('key') && qParams.get('uuid')) {
-                return {
-                    showPopup: true,
-                    page: 'unsubscribe',
-                    pageData: {
-                        uuid: qParams.get('uuid'),
-                        key: qParams.get('key'),
-                        newsletterUuid: qParams.get('newsletter'),
-                        comments: qParams.get('comments')
-                    }
-                };
-            } else { // any malformed unsubscribe links should simply go to email prefs
-                return {
-                    showPopup: true,
-                    page: 'accountEmail',
-                    pageData: {
-                        newsletterUuid: qParams.get('newsletter'),
-                        action: 'unsubscribe',
-                        redirect: site.url + '#/portal/account/newsletters'
-                    }
-                };
-            }
+            return {
+                showPopup: true,
+                page: 'accountHome'
+            };
         }
 
         if (hasRecommendations({site}) && qParams.get('action') === 'signup' && qParams.get('success') === 'true') {
@@ -563,11 +461,8 @@ export default class App extends React.Component {
         const [, qs] = window.location.hash.substr(1).split('?');
         if (hasMode(['preview'])) {
             let data = {};
-            if (hasMode(['offerPreview'])) {
-                data = this.fetchOfferQueryStrData(qs);
-            } else {
-                data = this.fetchQueryStrData(qs);
-            }
+            // Offer preview mode removed - only handle regular query string data
+            data = this.fetchQueryStrData(qs);
             return {
                 ...data,
                 showPopup: true
@@ -746,67 +641,26 @@ export default class App extends React.Component {
         this.setState(updatedState);
     }
 
-    /** Handle Portal offer urls */
-    async handleOfferQuery({site, offerId, member = this.state.member}) {
-        const {portal_button: portalButton} = site;
+    /** Handle Portal offer urls - deprecated in payment-free system */
+    async handleOfferQuery() {
+        // No-op: offers not supported in payment-free system
         removePortalLinkFromUrl();
-        if (!isPaidMember({member})) {
-            try {
-                const offerData = await this.GhostApi.site.offer({offerId});
-                const offer = offerData?.offers[0];
-                if (isActiveOffer({site, offer})) {
-                    if (!portalButton) {
-                        const product = getProductFromId({site, productId: offer.tier.id});
-                        const price = offer.cadence === 'month' ? product.monthlyPrice : product.yearlyPrice;
-                        this.dispatchAction('openPopup', {
-                            page: 'loading'
-                        });
-                        if (member) {
-                            const {tierId, cadence} = getProductCadenceFromPrice({site, priceId: price.id});
-                            this.dispatchAction('checkoutPlan', {plan: price.id, offerId, tierId, cadence});
-                        } else {
-                            const {tierId, cadence} = getProductCadenceFromPrice({site, priceId: price.id});
-                            this.dispatchAction('signup', {plan: price.id, offerId, tierId, cadence});
-                        }
-                    } else {
-                        this.dispatchAction('openPopup', {
-                            page: 'offer',
-                            pageData: offerData?.offers[0]
-                        });
-                    }
-                }
-            } catch (e) {
-                // ignore invalid portal url
-            }
-        }
     }
 
-    /** Handle direct signup link for a price */
-    handleSignupQuery({site, pageQuery, member}) {
-        const offerQueryRegex = /^offers\/(\w+?)\/?$/;
-        let priceId = pageQuery;
-        if (offerQueryRegex.test(pageQuery || '')) {
-            const [, offerId] = pageQuery.match(offerQueryRegex);
-            this.handleOfferQuery({site, offerId, member});
+    /** Handle direct signup link - simplified for payment-free system */
+    handleSignupQuery({pageQuery}) {
+        // Only handle free signup in payment-free system
+        if (pageQuery === 'free' || !pageQuery) {
+            // Free signup is handled by default signup flow
             return;
         }
-        if (getPriceIdFromPageQuery({site, pageQuery})) {
-            priceId = getPriceIdFromPageQuery({site, pageQuery});
-        }
-        const queryPrice = getQueryPrice({site: site, priceId});
-        if (pageQuery
-            && pageQuery !== 'free'
-        ) {
-            removePortalLinkFromUrl();
-            const plan = queryPrice?.id || priceId;
-            if (plan !== 'free') {
-                this.dispatchAction('openPopup', {
-                    page: 'loading'
-                });
-            }
-            const {tierId, cadence} = getProductCadenceFromPrice({site, priceId: plan});
-            this.dispatchAction('signup', {plan, tierId, cadence});
-        }
+        
+        // Redirect any paid signup attempts to free signup
+        removePortalLinkFromUrl();
+        this.dispatchAction('openPopup', {
+            page: 'signup',
+            pageQuery: 'free'
+        });
     }
 
     /**Get Portal page from Link/Data-attribute path*/
@@ -877,10 +731,7 @@ export default class App extends React.Component {
             return {
                 page: 'accountProfile'
             };
-        } else if (path === 'account/newsletters') {
-            return {
-                page: 'accountEmail'
-            };
+        // Newsletter management removed - redirect to account home
         } else if (path === 'support') {
             return {
                 page: 'support'
@@ -900,21 +751,8 @@ export default class App extends React.Component {
                     signup: false
                 }
             };
-        } else if (path === 'account/newsletters/help') {
-            return {
-                page: 'emailReceivingFAQ',
-                pageData: {
-                    direct: true
-                }
-            };
-        } else if (path === 'account/newsletters/disabled') {
-            return {
-                page: 'emailSuppressionFAQ',
-                pageData: {
-                    direct: true
-                }
-            };
         }
+        // Newsletter help pages removed - redirect to account home
 
         return {
             page: 'default'
@@ -931,11 +769,12 @@ export default class App extends React.Component {
     getContextPage({site, page, member}) {
         /**Set default page based on logged-in status */
         if (!page || page === 'default') {
-            const loggedOutPage = isInviteOnly({site}) || !hasAvailablePrices({site}) ? 'signin' : 'signup';
+            const loggedOutPage = isInviteOnly({site}) ? 'signin' : 'signup';
             page = member ? 'accountHome' : loggedOutPage;
         }
 
-        if (page === 'accountPlan' && isComplimentaryMember({member}) && !allowCompMemberUpgrade({member})) {
+        // Account plan page removed - payment functionality deprecated
+        if (page === 'accountPlan') {
             page = 'accountHome';
         }
 

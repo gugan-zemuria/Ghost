@@ -13,7 +13,6 @@ const serveFavicon = require('./routers/serve-favicon');
 const themeEngine = require('../services/theme-engine');
 const themeMiddleware = themeEngine.middleware;
 const membersService = require('../../server/services/members');
-const offersService = require('../../server/services/offers');
 const customRedirects = require('../../server/services/custom-redirects');
 const linkRedirects = require('../../server/services/link-redirection');
 const {cardAssets} = require('../services/assets-minification');
@@ -48,8 +47,6 @@ module.exports = function setupSiteApp(routerConfig) {
 
     // enable CORS headers (allows admin client to hit front-end when configured on separate URLs)
     siteApp.use(mw.cors);
-
-    siteApp.use(offersService.middleware);
 
     siteApp.use(linkRedirects.service.handleRequest);
 

@@ -81,20 +81,8 @@ module.exports = {
         return apiFramework.pipeline(require('./announcements'), localUtils);
     },
 
-    get membersStripeConnect() {
-        return apiFramework.pipeline(require('./members-stripe-connect'), localUtils);
-    },
-
     get members() {
         return apiFramework.pipeline(require('./members'), localUtils);
-    },
-
-    get offers() {
-        return apiFramework.pipeline(require('./offers'), localUtils);
-    },
-
-    get tiers() {
-        return apiFramework.pipeline(require('./tiers'), localUtils);
     },
 
     get memberSigninUrls() {
@@ -119,6 +107,10 @@ module.exports = {
 
     get tags() {
         return apiFramework.pipeline(require('./tags'), localUtils);
+    },
+
+    get tiers() {
+        return apiFramework.pipeline(require('./tiers'), localUtils);
     },
 
     get users() {
@@ -189,10 +181,6 @@ module.exports = {
         return require('./utils/serializers');
     },
 
-    get newsletters() {
-        return apiFramework.pipeline(require('./newsletters'), localUtils);
-    },
-
     get comments() {
         return apiFramework.pipeline(require('./comments'), localUtils);
     },
@@ -243,18 +231,6 @@ module.exports = {
 
     get authorsPublic() {
         return apiFramework.pipeline(require('./authors-public'), localUtils, 'content');
-    },
-
-    get tiersPublic() {
-        return apiFramework.pipeline(require('./tiers-public'), localUtils, 'content');
-    },
-
-    get newslettersPublic() {
-        return apiFramework.pipeline(require('./newsletters-public'), localUtils, 'content');
-    },
-
-    get offersPublic() {
-        return apiFramework.pipeline(require('./offers-public'), localUtils, 'content');
     },
 
     get commentsMembers() {

@@ -4,7 +4,7 @@ const BACKUP_TABLES = [
     'api_keys',
     'automated_emails',
     'brute',
-    'donation_payment_events',
+    // 'donation_payment_events', // Payment feature removed
     'emails',
     'integrations',
     'invites',
@@ -12,8 +12,8 @@ const BACKUP_TABLES = [
     'members',
     'members_labels',
     'members_products',
-    'members_stripe_customers',
-    'members_stripe_customers_subscriptions',
+    // 'members_stripe_customers', // Payment feature removed
+    // 'members_stripe_customers_subscriptions', // Payment feature removed
     'migrations',
     'migrations_lock',
     'permissions',
@@ -22,23 +22,22 @@ const BACKUP_TABLES = [
     'webhooks',
     'tokens',
     'sessions',
-    'subscriptions',
+    // 'subscriptions', // Payment feature removed
     'mobiledoc_revisions',
     'post_revisions',
     'email_batches',
     'email_recipients',
     'email_recipient_failures',
-    'members_cancel_events',
-    'members_payment_events',
+    // 'members_cancel_events', // Payment feature removed
+    // 'members_payment_events', // Payment feature removed
     'members_login_events',
     'members_email_change_events',
     'members_status_events',
-    'members_paid_subscription_events',
+    // 'members_paid_subscription_events', // Payment feature removed
     'members_subscribe_events',
     'members_product_events',
     'members_created_events',
-    'members_subscription_created_events',
-    'members_newsletters',
+    // 'members_subscription_created_events', // Payment feature removed
     'mentions',
     'comments',
     'comment_likes',
@@ -73,14 +72,13 @@ const TABLES_ALLOWLIST = [
     'tags',
     'users',
     'products',
-    'stripe_products',
-    'stripe_prices',
+    // 'stripe_products', // Payment feature removed
+    // 'stripe_prices', // Payment feature removed
     'posts_products',
-    'newsletters',
     'benefits',
     'products_benefits',
-    'offers',
-    'offer_redemptions',
+    // 'offers', // Payment feature removed
+    // 'offer_redemptions', // Payment feature removed
     'snippets'
 ];
 

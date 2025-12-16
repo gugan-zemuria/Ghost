@@ -4,7 +4,8 @@ const MembersService = require('../members');
 const PostsService = require('../posts/posts-service')();
 const PublicConfigService = require('../public-config');
 const StatsService = require('../stats');
-const StripeService = require('../stripe');
+// Payment feature removed
+// const StripeService = require('../stripe');
 
 const models = require('../../models');
 
@@ -13,6 +14,6 @@ module.exports = new ExploreService({
     PostsService,
     PublicConfigService,
     StatsService,
-    StripeService,
+    StripeService: null, // Payment feature removed
     UserModel: models.User
 });

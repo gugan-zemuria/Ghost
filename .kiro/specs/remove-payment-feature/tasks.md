@@ -1,0 +1,213 @@
+# Implementation Plan
+
+- [x] 1. Remove Payment API Layer
+  - [x] 1.1 Remove payment API endpoint files
+    - Delete `core/server/api/endpoints/offers.js`
+    - Delete `core/server/api/endpoints/offers-public.js`
+    - Delete `core/server/api/endpoints/tiers.js`
+    - Delete `core/server/api/endpoints/tiers-public.js`
+    - Delete `core/server/api/endpoints/members-stripe-connect.js`
+    - _Requirements: 2.1, 2.3_
+  - [x] 1.2 Update API index to remove payment exports
+    - Remove `offers` getter from `core/server/api/endpoints/index.js`
+    - Remove `offersPublic` getter from index
+    - Remove `tiers` getter from index
+    - Remove `tiersPublic` getter from index
+    - Remove `membersStripeConnect` getter from index
+    - _Requirements: 2.2_
+  - [x] 1.3 Write property test for API endpoint removal
+    - **Property 1: Payment API Endpoints Return 404**
+    - **Validates: Requirements 1.4, 2.1**
+
+- [x] 2. Remove Stripe Service Layer
+  - [x] 2.1 Remove Stripe service directory
+    - Delete entire `core/server/services/stripe/` directory
+    - _Requirements: 1.1, 1.3_
+  - [x] 2.2 Remove offers service directory
+    - Delete entire `core/server/services/offers/` directory
+    - _Requirements: 1.1_
+  - [x] 2.3 Remove tiers service directory
+    - Delete entire `core/server/services/tiers/` directory
+    - _Requirements: 1.1_
+  - [x] 2.4 Remove donations service directory
+    - Delete entire `core/server/services/donations/` directory
+    - _Requirements: 1.1_
+  - [x] 2.5 Update service imports referencing payment services
+    - Search for and remove imports of Stripe, offers, tiers, donations services
+    - _Requirements: 1.2_
+
+- [x] 3. Remove Payment Data Models
+  - [x] 3.1 Remove Stripe-related model files
+    - Delete `core/server/models/member-stripe-customer.js`
+    - Delete `core/server/models/stripe-customer-subscription.js`
+    - Delete `core/server/models/stripe-price.js`
+    - Delete `core/server/models/stripe-product.js`
+    - _Requirements: 1.2_
+  - [x] 3.2 Remove payment event model files
+    - Delete `core/server/models/member-payment-event.js`
+    - Delete `core/server/models/donation-payment-event.js`
+    - Delete `core/server/models/member-paid-subscription-event.js`
+    - Delete `core/server/models/subscription-created-event.js`
+    - Delete `core/server/models/member-cancel-event.js`
+    - _Requirements: 1.2_
+  - [x] 3.3 Remove offer model files
+    - Delete `core/server/models/offer.js`
+    - Delete `core/server/models/offer-redemption.js`
+    - _Requirements: 1.2_
+  - [x] 3.4 Update models index to remove payment exports
+    - Remove all payment model registrations from models index
+    - _Requirements: 1.2_
+  - [x] 3.5 Update Member model to remove payment relationships
+    - Remove `stripeCustomers()` relationship method
+    - Remove `stripeSubscriptions()` relationship method
+    - Remove `stripeCustomers` from relationships array
+    - Remove payment-related query methods
+    - _Requirements: 7.1, 7.3_
+  - [x] 3.6 Write property test for member data integrity
+    - **Property 2: Member Data Integrity After Removal**
+    - **Validates: Requirements 7.1, 7.2, 7.3**
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Update Database Schema
+  - [x] 5.1 Remove payment table definitions from schema.js
+    - Remove `members_stripe_customers` table definition
+    - Remove `members_stripe_customers_subscriptions` table definition
+    - Remove `stripe_products` table definition
+    - Remove `stripe_prices` table definition
+    - Remove `offers` table definition
+    - Remove `offer_redemptions` table definition
+    - Remove `members_payment_events` table definition
+    - Remove `donation_payment_events` table definition
+    - Remove `subscriptions` table definition
+    - Remove `subscription_created_events` table definition
+    - Remove `members_cancel_events` table definition
+    - _Requirements: 3.1_
+  - [x] 5.2 Simplify products table schema
+    - Remove `monthly_price_id` column
+    - Remove `yearly_price_id` column
+    - Remove `currency` column
+    - Remove `monthly_price` column
+    - Remove `yearly_price` column
+    - Remove `trial_days` column
+    - _Requirements: 8.1, 8.2_
+  - [x] 5.3 Update Product model to remove payment references
+    - Remove Stripe pricing relationships
+    - Remove payment-related methods
+    - _Requirements: 8.2_
+  - [x] 5.4 Write property test for product data format
+    - **Property 4: Product API Response Format**
+    - **Validates: Requirements 8.1, 8.3**
+
+- [x] 6. Handle Payment Migrations
+  - [x] 6.1 Create migration to drop payment tables
+    - Create new migration that drops tables in correct order (FK dependencies)
+    - Drop `offer_redemptions` first
+    - Drop `subscription_created_events`
+    - Drop `members_stripe_customers_subscriptions`
+    - Drop `members_stripe_customers`
+    - Drop `stripe_prices`
+    - Drop `stripe_products`
+    - Drop `offers`
+    - Drop `members_payment_events`
+    - Drop `donation_payment_events`
+    - _Requirements: 3.2_
+  - [x] 6.2 Remove or disable existing payment migration files
+    - Identify all migration files with "stripe", "offer", "payment", "subscription" in name
+    - Either delete or convert to no-op migrations
+    - _Requirements: 3.2_
+    - Note: Existing migrations are already safe - they check for table/column existence before modifying
+
+- [x] 7. Update Members Service
+  - [x] 7.1 Remove payment processing from members API
+    - Updated `core/server/services/members/api.js` to remove payment models
+    - Removed DonationPaymentEvent, MemberPaymentEvent references
+    - Removed StripeCustomer, StripePrice, StripeProduct references
+    - Updated members-api.js to remove PaymentsService, tiersService, stripeAPIService, offersAPI
+    - _Requirements: 1.2, 7.1_
+  - [x] 7.2 Update MemberRepository to remove payment methods
+    - Simplified MemberRepository to remove subscription-related methods
+    - Removed Stripe customer linking methods
+    - Simplified ProductRepository to remove Stripe dependencies
+    - Simplified EventRepository to remove payment events
+    - Simplified MemberBREADService to remove Stripe/offers dependencies
+    - Updated RouterController to remove checkout/payment endpoints
+    - Updated MemberController to remove subscription update methods
+    - _Requirements: 7.3_
+  - [x] 7.3 Write property test for core functionality
+    - **Property 3: Core Functionality Preserved**
+    - **Validates: Requirements 1.3, 5.3**
+
+- [ ] 8. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. Update Data Exporters and Importers
+  - [ ] 9.1 Remove payment tables from table lists
+    - Update `core/server/data/exporter/table-lists.js` to remove payment tables
+    - _Requirements: 6.1_
+  - [ ] 9.2 Remove payment-related importers
+    - Remove or disable payment-related importer files
+    - _Requirements: 6.1_
+
+- [ ] 10. Update Portal Frontend Components
+  - [ ] 10.1 Remove payment pages from Portal
+    - Remove subscription/payment pages from `apps/portal/src/`
+    - Update page routing to remove payment routes
+    - _Requirements: 5.1_
+  - [ ] 10.2 Update Portal helper functions
+    - Remove payment-related helper functions
+    - Update components using payment helpers
+    - _Requirements: 5.2, 5.3_
+  - [ ] 10.3 Update account pages
+    - Remove subscription management from account pages
+    - Remove payment history display
+    - _Requirements: 5.2_
+  - [ ] 10.4 Simplify signup flow
+    - Remove paid tier selection from signup
+    - Keep only free membership signup
+    - _Requirements: 5.1_
+
+- [ ] 11. Update Admin UI Components
+  - [ ] 11.1 Remove payment settings from admin-x-settings
+    - Remove Stripe connect settings
+    - Remove offers management
+    - Remove tier pricing management
+    - _Requirements: 4.1_
+  - [ ] 11.2 Update admin settings navigation
+    - Remove payment menu items from settings navigation
+    - _Requirements: 4.1, 4.2_
+  - [ ] 11.3 Remove billing components
+    - Remove billing iframe and related components
+    - _Requirements: 4.3_
+
+- [ ] 12. Clean Up Remaining References
+  - [ ] 12.1 Search and remove payment imports across codebase
+    - Use grep to find remaining payment references
+    - Update or remove each reference
+    - _Requirements: 6.1_
+  - [ ] 12.2 Update test fixtures and data generators
+    - Remove payment fixtures from test data generators
+    - Remove Stripe-related test data
+    - _Requirements: 6.2_
+  - [ ] 12.3 Remove payment-specific test files
+    - Delete payment-related test files
+    - Update test suites to remove payment tests
+    - _Requirements: 6.2_
+
+- [ ] 13. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 14. Verify Build and Startup
+  - [ ] 14.1 Run full build
+    - Execute build commands for all packages
+    - Verify no compilation errors
+    - _Requirements: 6.3_
+  - [ ] 14.2 Verify server startup
+    - Start Ghost server
+    - Verify no startup errors related to payments
+    - _Requirements: 1.1, 2.3_
+  - [ ] 14.3 Run full test suite
+    - Execute all unit and integration tests
+    - Verify no payment-related failures
+    - _Requirements: 6.2_

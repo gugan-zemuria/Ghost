@@ -204,17 +204,8 @@ class EmailEventStorage {
 
     async findNewslettersToKeep(event) {
         try {
-            const member = await this.#membersRepository.get({email: event.email}, {
-                withRelated: ['newsletters']
-            });
-            const existingNewsletters = member.related('newsletters');
-
-            const email = await this.#models.Email.findOne({id: event.emailId});
-            const newsletterToRemove = email.get('newsletter_id');
-
-            return existingNewsletters.models.filter(newsletter => newsletter.id !== newsletterToRemove).map((n) => {
-                return {id: n.id};
-            });
+            // Newsletter feature removed - return empty array
+            return [];
         } catch (err) {
             logging.error(err);
             return [];

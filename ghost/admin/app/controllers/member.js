@@ -31,7 +31,7 @@ export default class MemberController extends Controller {
     @tracked showLabelModal = false;
 
     _previousLabels = null;
-    _previousNewsletters = null;
+    // Newsletter feature removed
 
     @tracked directlyFromAnalytics = false;
     @tracked postAnalytics = null;
@@ -66,9 +66,7 @@ export default class MemberController extends Controller {
         return this.member.get('labels').map(label => label.name);
     }
 
-    get _newsletters() {
-        return this.member.get('newsletters').map(newsletter => newsletter.id);
-    }
+    // Newsletter feature removed
 
     get labelModalData() {
         let label = this.modalLabel;
@@ -109,7 +107,7 @@ export default class MemberController extends Controller {
     @action
     setInitialRelationshipValues() {
         this._previousLabels = this._labels;
-        this._previousNewsletters = this._newsletters;
+        // Newsletter feature removed
     }
 
     @action
@@ -266,14 +264,7 @@ export default class MemberController extends Controller {
             return true;
         }
 
-        // member.newsletters is an array so hasDirtyAttributes doesn't pick up
-        // changes unless the array ref is changed
-        // use sort() to sort of detect same item is re-enabled
-        let currentNewsletters = (this._newsletters.sort() || []).join(', ');
-        let previousNewsletters = (this._previousNewsletters.sort() || []).join(', ');
-        if (currentNewsletters !== previousNewsletters) {
-            return true;
-        }
+        // Newsletter feature removed
 
         // we've covered all the non-tracked cases we care about so fall
         // back on Ember Data's default dirty attribute checks

@@ -1,85 +1,79 @@
-const tiersService = require('../../services/tiers');
+const tpl = require('@tryghost/tpl');
+const errors = require('@tryghost/errors');
+
+const messages = {
+    tierNotFound: 'Tier not found.'
+};
 
 /** @type {import('@tryghost/api-framework').Controller} */
-const controller = {
+module.exports = {
     docName: 'tiers',
-
     browse: {
         headers: {
             cacheInvalidate: false
         },
         options: [
-            'limit',
-            'fields',
+            'include',
             'filter',
+            'fields',
+            'limit',
             'order',
-            'debug',
-            'page'
+            'page',
+            'debug'
         ],
-        permissions: {
-            docName: 'products'
+        validation: {
+            options: {
+                include: {
+                    values: ['monthly_price', 'yearly_price', 'benefits']
+                }
+            }
         },
-        async query(frame) {
-            const page = await tiersService.api.browse(frame.options);
-            return page;
+        permissions: false,
+        query(frame) {
+            // Return empty tiers array since payment functionality is disabled
+            // Return in the format that Ghost's serializer expects
+            return Promise.resolve({
+                data: [],
+                meta: {
+                    pagination: {
+                        page: frame.options.page || 1,
+                        limit: frame.options.limit || 15,
+                        pages: 1,
+                        total: 0,
+                        next: null,
+                        prev: null
+                    }
+                }
+            });
         }
     },
-
     read: {
         headers: {
             cacheInvalidate: false
         },
-        data: [
-            'id'
-        ],
-        permissions: {
-            docName: 'products'
-        },
-        async query(frame) {
-            return await tiersService.api.read(frame.data.id);
-        }
-    },
-
-    add: {
-        statusCode: 201,
-        headers: {
-            cacheInvalidate: true
-        },
-        validation: {
-            data: {
-                name: {required: true}
-            }
-        },
-        permissions: {
-            docName: 'products'
-        },
-        async query(frame) {
-            return await tiersService.api.add(frame.data);
-        }
-    },
-
-    edit: {
-        statusCode: 200,
         options: [
-            'id'
+            'include',
+            'filter',
+            'fields',
+            'debug'
         ],
-        headers: {
-            cacheInvalidate: true
-        },
+        data: [
+            'id',
+            'slug'
+        ],
         validation: {
             options: {
-                id: {
-                    required: true
+                include: {
+                    values: ['monthly_price', 'yearly_price', 'benefits']
                 }
             }
         },
-        permissions: {
-            docName: 'products'
-        },
-        async query(frame) {
-            return await tiersService.api.edit(frame.options.id, frame.data);
+        permissions: false,
+        async query() {
+            // Return 404 for individual tier reads since no tiers exist
+            throw new errors.NotFoundError({
+                message: tpl(messages.tierNotFound)
+            });
         }
     }
 };
-
-module.exports = controller;

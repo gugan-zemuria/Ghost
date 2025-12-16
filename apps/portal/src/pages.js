@@ -1,21 +1,12 @@
+
 import SigninPage from './components/pages/signin-page';
 import SignupPage from './components/pages/signup-page';
 import AccountHomePage from './components/pages/AccountHomePage/account-home-page';
 import MagicLinkPage from './components/pages/magic-link-page';
 import LoadingPage from './components/pages/loading-page';
-import AccountPlanPage from './components/pages/account-plan-page';
 import AccountProfilePage from './components/pages/account-profile-page';
-import AccountEmailPage from './components/pages/account-email-page';
-import OfferPage from './components/pages/offer-page';
-import NewsletterSelectionPage from './components/pages/newsletter-selection-page';
-import UnsubscribePage from './components/pages/unsubscribe-page';
+// Newsletter and email page imports removed - functionality deprecated
 import FeedbackPage from './components/pages/feedback-page';
-import EmailSuppressedPage from './components/pages/email-suppressed-page';
-import EmailSuppressionFAQ from './components/pages/email-suppression-faq';
-import EmailReceivingFAQ from './components/pages/email-receiving-faq';
-import SupportPage from './components/pages/support-page';
-import SupportSuccess from './components/pages/support-success';
-import SupportError from './components/pages/support-error';
 import RecommendationsPage from './components/pages/recommendations-page';
 
 /** List of all available pages in Portal, mapped to their UI component
@@ -25,21 +16,11 @@ const Pages = {
     signin: SigninPage,
     signup: SignupPage,
     accountHome: AccountHomePage,
-    accountPlan: AccountPlanPage,
     accountProfile: AccountProfilePage,
-    accountEmail: AccountEmailPage,
-    signupNewsletter: NewsletterSelectionPage,
-    unsubscribe: UnsubscribePage,
+    // Newsletter and email pages removed - functionality deprecated
     magiclink: MagicLinkPage,
     loading: LoadingPage,
-    offer: OfferPage,
     feedback: FeedbackPage,
-    emailSuppressed: EmailSuppressedPage,
-    emailSuppressionFAQ: EmailSuppressionFAQ,
-    emailReceivingFAQ: EmailReceivingFAQ,
-    support: SupportPage,
-    supportSuccess: SupportSuccess,
-    supportError: SupportError,
     recommendations: RecommendationsPage
 };
 
@@ -55,12 +36,10 @@ export const isAccountPage = function ({page}) {
     return page.includes('account');
 };
 
-export const isOfferPage = function ({page}) {
-    return page.includes('offer');
+export const isOfferPage = function () {
+    return false; // No offer pages without payment functionality
 };
 
-export const isSupportPage = function ({page}) {
-    return page.includes('support');
-};
+// Payment and newsletter page helpers removed
 
 export default Pages;

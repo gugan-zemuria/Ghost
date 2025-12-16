@@ -6,23 +6,15 @@ const dateToDatabaseString = require('../utils/database-date');
 
 class EmailsImporter extends TableImporter {
     static table = 'emails';
-    static dependencies = ['posts', 'newsletters', 'members_subscribe_events'];
+    static dependencies = ['posts', 'members_subscribe_events'];
 
     constructor(knex, transaction) {
         super(EmailsImporter.table, knex, transaction);
     }
 
     async import(quantity) {
-        if (quantity === 0) {
-            return;
-        }
-
-        const posts = await this.transaction.select('id', 'title', 'published_at').from('posts').where('type', 'post').where('status', 'published').orderBy('published_at', 'desc');
-        this.newsletters = await this.transaction.select('id').from('newsletters').orderBy('sort_order');
-        this.membersSubscribeEvents = await this.transaction.select('id', 'newsletter_id', 'created_at').from('members_subscribe_events');
-
-        // Only generate emails for last 25% of posts, and only generate emails for 50% of those
-        await this.importForEach(posts.slice(0, Math.ceil(posts.length / 4)), quantity ? quantity / posts.length : 0.5);
+        // Newsletters removed - skip email generation
+        return;
     }
 
     generate() {

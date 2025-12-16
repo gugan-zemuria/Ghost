@@ -46,9 +46,11 @@ const controller = {
             };
         },
         async query(frame) {
-            return await statsService.api.getMRRHistory({
-                dateFrom: frame?.options?.date_from
-            });
+            // Return empty MRR data since payment functionality is disabled
+            return {
+                data: [],
+                meta: {}
+            };
         }
     },
     subscriptions: {
@@ -67,7 +69,15 @@ const controller = {
             };
         },
         async query() {
-            return await statsService.api.getSubscriptionCountHistory();
+            // Return empty subscription data since payment functionality is disabled
+            return {
+                data: [],
+                meta: {
+                    cadences: [],
+                    tiers: [],
+                    totals: []
+                }
+            };
         }
     },
     postReferrers: {

@@ -5,32 +5,15 @@ const dateToDatabaseString = require('../utils/database-date');
 
 class MembersSubscribeEventsImporter extends TableImporter {
     static table = 'members_subscribe_events';
-    static dependencies = ['members', 'newsletters'];
+    static dependencies = ['members'];
 
     constructor(knex, transaction) {
         super(MembersSubscribeEventsImporter.table, knex, transaction);
     }
 
     async import(quantity) {
-        if (quantity === 0) {
-            return;
-        }
-
-        let offset = 0;
-        let limit = 100000;
-        this.newsletters = await this.transaction.select('id').from('newsletters').orderBy('sort_order');
-
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-            const members = await this.transaction.select('id', 'created_at', 'status').from('members').limit(limit).offset(offset);
-
-            if (members.length === 0) {
-                break;
-            }
-
-            await this.importForEach(members, quantity ? quantity / members.length : this.newsletters.length);
-            offset += limit;
-        }
+        // Newsletters removed - skip subscribe events generation
+        return;
     }
 
     setReferencedModel(model) {

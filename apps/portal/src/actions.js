@@ -1,6 +1,6 @@
 import setupGhostApi from './utils/api';
 import {chooseBestErrorMessage} from './utils/errors';
-import {createPopupNotification, getMemberEmail, getMemberName, getProductCadenceFromPrice, removePortalLinkFromUrl, getRefDomain} from './utils/helpers';
+import {createPopupNotification, getMemberEmail, getMemberName, removePortalLinkFromUrl, getRefDomain} from './utils/helpers';
 import {t} from './utils/i18n';
 
 function switchPage({data, state}) {
@@ -166,22 +166,12 @@ async function verifyOTC({data, api}) {
 
 async function signup({data, state, api}) {
     try {
-        let {plan, tierId, cadence, email, name, newsletters, offerId} = data;
+        let {email, name} = data;
 
-        if (plan.toLowerCase() === 'free') {
-            const integrityToken = await api.member.getIntegrityToken();
-            await api.member.sendMagicLink({emailType: 'signup', integrityToken, ...data});
-        } else {
-            if (tierId && cadence) {
-                await api.member.checkoutPlan({plan, tierId, cadence, email, name, newsletters, offerId});
-            } else {
-                ({tierId, cadence} = getProductCadenceFromPrice({site: state?.site, priceId: plan}));
-                await api.member.checkoutPlan({plan, tierId, cadence, email, name, newsletters, offerId});
-            }
-            return {
-                page: 'loading'
-            };
-        }
+        // Only support free signup - payment functionality removed
+        const integrityToken = await api.member.getIntegrityToken();
+        await api.member.sendMagicLink({emailType: 'signup', integrityToken, email, name});
+        
         return {
             page: 'magiclink',
             lastPage: 'signup',
@@ -202,128 +192,15 @@ async function signup({data, state, api}) {
     }
 }
 
-async function checkoutPlan({data, state, api}) {
-    try {
-        let {plan, offerId, tierId, cadence} = data;
-        if (!tierId || !cadence) {
-            ({tierId, cadence} = getProductCadenceFromPrice({site: state?.site, priceId: plan}));
-        }
-        await api.member.checkoutPlan({
-            plan,
-            tierId,
-            cadence,
-            offerId,
-            metadata: {
-                checkoutType: 'upgrade'
-            }
-        });
-    } catch (e) {
-        return {
-            action: 'checkoutPlan:failed',
-            popupNotification: createPopupNotification({
-                type: 'checkoutPlan:failed', autoHide: false, closeable: true, state, status: 'error',
-                message: t('Failed to process checkout, please try again')
-            })
-        };
-    }
-}
+// checkoutPlan action removed - payment functionality deprecated
 
-async function updateSubscription({data, state, api}) {
-    try {
-        const {plan, planId, subscriptionId, cancelAtPeriodEnd} = data;
-        const {tierId, cadence} = getProductCadenceFromPrice({site: state?.site, priceId: planId});
+// updateSubscription action removed - payment functionality deprecated
 
-        await api.member.updateSubscription({
-            planName: plan,
-            tierId,
-            cadence,
-            subscriptionId,
-            cancelAtPeriodEnd,
-            planId: planId
-        });
-        const member = await api.member.sessionData();
-        const action = 'updateSubscription:success';
-        return {
-            action,
-            popupNotification: createPopupNotification({
-                type: action, autoHide: true, closeable: true, state, status: 'success',
-                message: t('Subscription plan updated successfully')
-            }),
-            page: 'accountHome',
-            member: member
-        };
-    } catch (e) {
-        return {
-            action: 'updateSubscription:failed',
-            popupNotification: createPopupNotification({
-                type: 'updateSubscription:failed', autoHide: false, closeable: true, state, status: 'error',
-                message: t('Failed to update subscription, please try again')
-            })
-        };
-    }
-}
+// cancelSubscription action removed - payment functionality deprecated
 
-async function cancelSubscription({data, state, api}) {
-    try {
-        const {subscriptionId, cancellationReason} = data;
-        await api.member.updateSubscription({
-            subscriptionId, smartCancel: true, cancellationReason
-        });
-        const member = await api.member.sessionData();
-        const action = 'cancelSubscription:success';
-        return {
-            action,
-            page: 'accountHome',
-            member: member
-        };
-    } catch (e) {
-        return {
-            action: 'cancelSubscription:failed',
-            popupNotification: createPopupNotification({
-                type: 'cancelSubscription:failed', autoHide: false, closeable: true, state, status: 'error',
-                message: t('Failed to cancel subscription, please try again')
-            })
-        };
-    }
-}
+// continueSubscription action removed - payment functionality deprecated
 
-async function continueSubscription({data, state, api}) {
-    try {
-        const {subscriptionId} = data;
-        await api.member.updateSubscription({
-            subscriptionId, cancelAtPeriodEnd: false
-        });
-        const member = await api.member.sessionData();
-        const action = 'continueSubscription:success';
-        return {
-            action,
-            page: 'accountHome',
-            member: member
-        };
-    } catch (e) {
-        return {
-            action: 'continueSubscription:failed',
-            popupNotification: createPopupNotification({
-                type: 'continueSubscription:failed', autoHide: false, closeable: true, state, status: 'error',
-                message: t('Failed to cancel subscription, please try again')
-            })
-        };
-    }
-}
-
-async function editBilling({data, state, api}) {
-    try {
-        await api.member.editBilling(data);
-    } catch (e) {
-        return {
-            action: 'editBilling:failed',
-            popupNotification: createPopupNotification({
-                type: 'editBilling:failed', autoHide: false, closeable: true, state, status: 'error',
-                message: t('Failed to update billing information, please try again')
-            })
-        };
-    }
-}
+// editBilling action removed - payment functionality deprecated
 
 async function clearPopupNotification() {
     return {
@@ -346,36 +223,7 @@ async function showPopupNotification({data, state}) {
     };
 }
 
-async function updateNewsletterPreference({data, state, api}) {
-    try {
-        const {newsletters, enableCommentNotifications} = data;
-        if (!newsletters && enableCommentNotifications === undefined) {
-            return {};
-        }
-        const updateData = {};
-        if (newsletters) {
-            updateData.newsletters = newsletters;
-        }
-        if (enableCommentNotifications !== undefined) {
-            updateData.enableCommentNotifications = enableCommentNotifications;
-        }
-        const member = await api.member.update(updateData);
-        const action = 'updateNewsletterPref:success';
-        return {
-            action,
-            member
-        };
-    } catch (e) {
-        return {
-            action: 'updateNewsletterPref:failed',
-            popupNotification: createPopupNotification({
-                type: 'updateNewsletter:failed',
-                autoHide: true, closeable: true, state, status: 'error',
-                message: t('Failed to update newsletter settings')
-            })
-        };
-    }
-}
+// updateNewsletterPreference function removed - newsletter functionality deprecated
 
 async function removeEmailFromSuppressionList({state, api}) {
     try {
@@ -400,32 +248,7 @@ async function removeEmailFromSuppressionList({state, api}) {
     }
 }
 
-async function updateNewsletter({data, state, api}) {
-    try {
-        const {subscribed} = data;
-        const member = await api.member.update({subscribed});
-        if (!member) {
-            throw new Error('Failed to update newsletter');
-        }
-        const action = 'updateNewsletter:success';
-        return {
-            action,
-            member: member,
-            popupNotification: createPopupNotification({
-                type: action, autoHide: true, closeable: true, state, status: 'success',
-                message: t('Email newsletter settings updated')
-            })
-        };
-    } catch (e) {
-        return {
-            action: 'updateNewsletter:failed',
-            popupNotification: createPopupNotification({
-                type: 'updateNewsletter:failed', autoHide: true, closeable: true, state, status: 'error',
-                message: t('Failed to update newsletter settings')
-            })
-        };
-    }
-}
+// updateNewsletter function removed - newsletter functionality deprecated
 
 async function updateMemberEmail({data, state, api}) {
     const {email} = data;
@@ -624,16 +447,11 @@ const Actions = {
     startSigninOTCFromCustomForm,
     verifyOTC,
     signup,
-    updateSubscription,
-    cancelSubscription,
-    continueSubscription,
-    updateNewsletter,
+    // Payment actions removed: updateSubscription, cancelSubscription, continueSubscription, editBilling, checkoutPlan
+    // Newsletter actions removed: updateNewsletter, updateNewsletterPreference
     updateProfile,
     refreshMemberData,
     clearPopupNotification,
-    editBilling,
-    checkoutPlan,
-    updateNewsletterPreference,
     showPopupNotification,
     removeEmailFromSuppressionList,
     oneClickSubscribe,

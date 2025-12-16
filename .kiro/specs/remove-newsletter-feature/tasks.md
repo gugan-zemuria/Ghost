@@ -1,0 +1,143 @@
+# Implementation Plan
+
+- [x] 1. Remove Newsletter API Layer
+  - [x] 1.1 Remove newsletter API endpoint files
+    - Delete `core/server/api/endpoints/newsletters.js`
+    - Delete `core/server/api/endpoints/newsletters-public.js`
+    - Delete `core/server/api/endpoints/utils/serializers/output/mappers/newsletters.js`
+    - _Requirements: 2.1, 2.3_
+  - [x] 1.2 Update API index to remove newsletter exports
+    - Remove `newsletters` getter from `core/server/api/endpoints/index.js`
+    - Remove `newslettersPublic` getter from `core/server/api/endpoints/index.js`
+    - _Requirements: 2.2_
+  - [x] 1.3 Update mapper index to remove newsletter mapper
+    - Remove newsletters import from `core/server/api/endpoints/utils/serializers/output/mappers/index.js`
+    - _Requirements: 2.2_
+  - [x] 1.4 Write property test for API endpoint removal
+    - **Property 1: API Endpoint Removal Completeness**
+    - **Validates: Requirements 2.1**
+
+- [x] 2. Remove Newsletter Service Layer
+  - [x] 2.1 Remove newsletter service directory
+    - Delete entire `core/server/services/newsletters/` directory
+    - _Requirements: 1.1, 1.3_
+  - [x] 2.2 Update any service imports referencing newsletters
+    - Search for and remove imports of newsletter service across codebase
+    - _Requirements: 1.2_
+
+- [x] 3. Remove Newsletter Data Models
+  - [x] 3.1 Remove newsletter model files
+    - Delete `core/server/models/newsletter.js`
+    - Delete `core/server/models/member-newsletter.js`
+    - _Requirements: 1.2_
+  - [x] 3.2 Update models index to remove newsletter exports
+    - Remove newsletter model registration from models index
+    - _Requirements: 1.2_
+  - [x] 3.3 Update Member model to remove newsletter relationships
+    - Remove `newsletters()` relationship method from `core/server/models/member.js`
+    - Remove newsletter-related query methods
+    - Remove `members_newsletters` references
+    - _Requirements: 7.1, 7.3_
+  - [x] 3.4 Write property test for member data integrity
+    - **Property 2: Member Data Integrity After Removal**
+    - **Validates: Requirements 7.1, 7.2**
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Update Database Schema
+  - [x] 5.1 Remove newsletter table definitions from schema.js
+    - Remove `newsletters` table definition from `core/server/data/schema/schema.js`
+    - Remove `members_newsletters` table definition from `core/server/data/schema/schema.js`
+    - _Requirements: 3.1_
+  - [x] 5.2 Remove newsletter_id from posts table schema
+    - Remove `newsletter_id` column from posts table in schema.js
+    - _Requirements: 3.3_
+  - [x] 5.3 Update Post model to remove newsletter references
+    - Remove newsletter relationship from Post model
+    - Remove newsletter_id handling
+    - _Requirements: 3.3_
+  - [x] 5.4 Write property test for post data integrity
+    - **Property 3: Post Data Integrity**
+    - **Validates: Requirements 3.3, 7.3**
+
+- [ ] 6. Handle Newsletter Migrations
+  - [ ] 6.1 Create migration to drop newsletter tables
+    - Create new migration that drops `members_newsletters` table (must be first due to FK)
+    - Drop `newsletters` table
+    - Remove `newsletter_id` column from posts table
+    - _Requirements: 3.2_
+  - [ ] 6.2 Remove or disable existing newsletter migration files
+    - Identify all migration files with "newsletter" in name
+    - Either delete or convert to no-op migrations
+    - _Requirements: 3.2_
+
+- [x] 7. Update Data Exporters and Importers
+  - [x] 7.1 Remove newsletter from table lists
+    - Update `core/server/data/exporter/table-lists.js` to remove newsletter tables
+    - _Requirements: 6.1_
+  - [x] 7.2 Remove MembersNewslettersImporter
+    - Delete or disable `core/server/data/seeders/importers/MembersNewslettersImporter.js`
+    - _Requirements: 6.1_
+
+- [ ] 8. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. Update Portal Frontend Components
+  - [ ] 9.1 Remove newsletter selection page
+    - Update `apps/portal/src/pages.js` to remove NewsletterSelectionPage import
+    - Remove signupNewsletter route
+    - _Requirements: 5.1_
+  - [ ] 9.2 Update Portal helper functions
+    - Remove `hasMultipleNewsletters`, `getSiteNewsletters`, `hasNewsletterSendingEnabled` from helpers
+    - Update components using these helpers
+    - _Requirements: 5.2, 5.3_
+  - [ ] 9.3 Update unsubscribe page
+    - Modify `apps/portal/src/components/pages/unsubscribe-page.js` to remove newsletter management
+    - _Requirements: 5.2_
+  - [ ] 9.4 Update account email page
+    - Remove newsletter management from account pages
+    - Update routing for `/account/newsletters` paths
+    - _Requirements: 5.2_
+  - [ ] 9.5 Update app.js routing
+    - Remove newsletter-related routes from `apps/portal/src/app.js`
+    - _Requirements: 5.2_
+
+- [ ] 10. Update Admin UI Components
+  - [ ] 10.1 Remove newsletter settings from admin-x-settings
+    - Remove `apps/admin-x-settings/src/components/settings/email/newsletters/` directory
+    - _Requirements: 4.1_
+  - [ ] 10.2 Update admin settings navigation
+    - Remove newsletter menu items from settings navigation
+    - _Requirements: 4.1, 4.2_
+
+- [-] 11. Clean Up Remaining References
+  - [ ] 11.1 Search and remove newsletter imports across codebase
+    - Use grep to find remaining newsletter references
+    - Update or remove each reference
+    - _Requirements: 6.1_
+  - [ ] 11.2 Update test fixtures and data generators
+    - Remove newsletter fixtures from `test/utils/fixtures/data-generator.js`
+    - Remove `members_newsletters` test data
+    - _Requirements: 6.2_
+  - [x] 11.3 Remove newsletter-specific test files
+    - Delete `test/e2e-api/admin/newsletters.test.js`
+    - Delete `test/unit/server/services/newsletters/` directory
+    - _Requirements: 6.2_
+
+- [ ] 12. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 13. Verify Build and Startup
+  - [ ] 13.1 Run full build
+    - Execute build commands for all packages
+    - Verify no compilation errors
+    - _Requirements: 6.3_
+  - [ ] 13.2 Verify server startup
+    - Start Ghost server
+    - Verify no startup errors related to newsletters
+    - _Requirements: 1.1, 2.3_
+  - [ ] 13.3 Run full test suite
+    - Execute all unit and integration tests
+    - Verify no newsletter-related failures
+    - _Requirements: 6.2_

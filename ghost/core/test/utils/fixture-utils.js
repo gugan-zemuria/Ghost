@@ -974,9 +974,7 @@ const getFixtureOps = (toDos) => {
         }
     });
 
-    fixtureOps.push(() => {
-        return require('../../core/server/services/tiers').repository?.init();
-    });
+    // Tiers service removed - no longer need to initialize
 
     return fixtureOps;
 };

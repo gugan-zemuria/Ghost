@@ -9,8 +9,7 @@ const Product = ghostBookshelf.Model.extend({
 
     defaults: {
         active: true,
-        visibility: 'none',
-        trial_days: 0
+        visibility: 'none'
     },
 
     relationships: ['benefits'],
@@ -22,12 +21,6 @@ const Product = ghostBookshelf.Model.extend({
 
     relationshipBelongsTo: {
         benefits: 'benefits'
-    },
-
-    applyCustomQuery() {
-        this.query((qb) => {
-            qb.leftJoin('stripe_prices', 'products.monthly_price_id', 'stripe_prices.id');
-        });
     },
 
     async onSaving(model, _attr, options) {
@@ -115,35 +108,12 @@ const Product = ghostBookshelf.Model.extend({
             });
     },
 
-    monthlyPrice() {
-        return this.belongsTo('StripePrice', 'monthly_price_id', 'id');
-    },
-
-    yearlyPrice() {
-        return this.belongsTo('StripePrice', 'yearly_price_id', 'id');
-    },
-
-    stripeProducts() {
-        return this.hasMany('StripeProduct', 'product_id', 'id');
-    },
-
-    stripePrices() {
-        return this.belongsToMany(
-            'StripePrice',
-            'stripe_products',
-            'product_id',
-            'stripe_product_id',
-            'id',
-            'stripe_product_id'
-        );
-    },
-
     members() {
         return this.belongsToMany('Member', 'members_products', 'product_id', 'member_id');
     }
 }, {
     orderDefaultRaw() {
-        return 'monthly_price ASC';
+        return 'name ASC';
     }
 });
 

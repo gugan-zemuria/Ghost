@@ -9,7 +9,7 @@ export default class MembersCountCacheService extends Service {
     @service store;
 
     cache = {};
-    hasMultipleNewsletters = null;
+    // Newsletter feature removed
 
     @action
     async count(query) {
@@ -32,21 +32,15 @@ export default class MembersCountCacheService extends Service {
     }
 
     @action
-    async countString(filter = '', {knownCount, newsletter} = {}) {
-        // Determine if we need to show the name of the newsletter or not
-        // TODO: replace this with a service or a settings boolean if we ever add a shortcut for this
-        if (this.hasMultipleNewsletters === null) {
-            const allNewsletters = await this.store.query('newsletter', {status: 'active', limit: 'all'});
-            this.hasMultipleNewsletters = allNewsletters.length > 1;
-        }
-
+    async countString(filter = '', {knownCount} = {}) {
+        // Newsletter feature removed
         const user = this.session.user;
 
-        const nounSingular = newsletter && this.hasMultipleNewsletters ? 'subscriber' : 'member';
+        const nounSingular = 'member';
         const nounPlural = nounSingular + 's';
-        const suffix = newsletter && this.hasMultipleNewsletters ? (' of ' + newsletter.name) : '';
+        const suffix = '';
 
-        const basicFilter = newsletter ? filter.replace(newsletter.recipientFilter, '').replace(/^\+\((.*)\)$/, '$1') : filter;
+        const basicFilter = filter;
         const filterParts = basicFilter.split(',');
         const isFree = filterParts.length === 1 && filterParts[0] === 'status:free';
         const isPaid = filterParts.length === 1 && filterParts[0] === 'status:-free';

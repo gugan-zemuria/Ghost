@@ -15,7 +15,7 @@ export default class MembersStatsService extends Service {
     @tracked events = null;
     @tracked countStats = null;
     @tracked mrrStats = null;
-    @tracked newsletterStats = null;
+    // Newsletter feature removed
     @tracked totalMemberCount = null;
 
     get memberCount() {
@@ -66,16 +66,7 @@ export default class MembersStatsService extends Service {
         return this._fetchMemberCountsTask.perform();
     }
 
-    fetchNewsletterStats() {
-        let staleData = this._lastFetchedNewsletterStats && (new Date() - this._lastFetchedNewsletterStats) > ONE_MINUTE;
 
-        // return existing stats unless data is > 1 min old
-        if (this.newsletterStats && !this._forceRefresh && !staleData && this._fetchNewsletterStatsTask.last) {
-            return this._fetchNewsletterStatsTask.last;
-        }
-
-        return this._fetchNewsletterStatsTask.perform();
-    }
 
     fillDates(data = []) {
         let currentRangeDate = moment().subtract(30, 'days');
@@ -156,41 +147,7 @@ export default class MembersStatsService extends Service {
         this._forceRefresh = true;
     }
 
-    @task
-    *_fetchNewsletterStatsTask() {
-        const limit = 5;
-        let query = {
-            filter: 'email_count:-0',
-            order: 'submitted_at desc',
-            limit: limit
-        };
-        const results = yield this.store.query('email', query);
-        const data = results.toArray();
-        let stats = data.map((d) => {
-            return {
-                subject: d.subject,
-                submittedAt: moment(d.submittedAtUTC).format('YYYY-MM-DD'),
-                openRate: d.openRate
-            };
-        });
 
-        const paddedResults = [];
-        if (data.length < limit) {
-            const pad = limit - data.length;
-            const lastSubmittedAt = data.length > 0 ? data[results.length - 1].submittedAtUTC : moment();
-            for (let i = 0; i < pad; i++) {
-                paddedResults.push({
-                    subject: '',
-                    submittedAt: moment(lastSubmittedAt).subtract(i + 1, 'days').format('YYYY-MM-DD'),
-                    openRate: 0
-                });
-            }
-        }
-        stats = stats .concat(paddedResults);
-        stats.reverse();
-        this.newsletterStats = stats;
-        return stats;
-    }
 
     @task
     *_fetchCountsTask() {

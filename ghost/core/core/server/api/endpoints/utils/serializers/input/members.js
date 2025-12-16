@@ -37,18 +37,20 @@ module.exports = {
             return;
         }
 
-        frame.options.withRelated = frame.options.withRelated.map((relation) => {
-            if (relation === 'tiers') {
-                return 'products';
-            }
-            return relation;
-        });
+        frame.options.withRelated = frame.options.withRelated
+            .filter((relation) => relation !== 'newsletters') // Remove newsletters
+            .map((relation) => {
+                if (relation === 'tiers') {
+                    return 'products';
+                }
+                return relation;
+            });
     },
 
     browse(apiConfig, frame) {
         debug('browse');
         defaultRelations(frame);
-        mapSubscribedFlagToNewsletterRelation(frame);
+        // Newsletter feature removed - no longer mapping subscribed flag
 
         if (!frame.options.order) {
             frame.options.autoOrder = 'created_at DESC, id DESC';
@@ -109,11 +111,11 @@ module.exports = {
 
     bulkEdit(apiConfig, frame) {
         debug('bulkEdit');
-        mapSubscribedFlagToNewsletterRelation(frame);
+        // Newsletter feature removed - no longer mapping subscribed flag
     },
 
     bulkDestroy(apiConfig, frame) {
         debug('bulkDestroy');
-        mapSubscribedFlagToNewsletterRelation(frame);
+        // Newsletter feature removed - no longer mapping subscribed flag
     }
 };

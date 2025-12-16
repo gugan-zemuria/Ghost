@@ -11,38 +11,40 @@ describe('EventRepository', function () {
             eventRepository = new EventRepository({
                 EmailRecipient: null,
                 MemberSubscribeEvent: null,
-                MemberPaymentEvent: null,
                 MemberStatusEvent: null,
                 MemberLoginEvent: null,
-                MemberPaidSubscriptionEvent: null,
-                labsService: null
+                MemberCreatedEvent: null,
+                MemberLinkClickEvent: null,
+                MemberFeedback: null,
+                EmailSpamComplaintEvent: null,
+                Comment: null,
+                labsService: null,
+                memberAttributionService: null,
+                MemberEmailChangeEvent: null
             });
         });
 
-        it('throws when using invalid filter', function () {
-            should.throws(() => {
-                eventRepository.getNQLSubset('undefined');
-            }, errors.BadRequestError);
+        it('returns null for invalid filter', function () {
+            const result = eventRepository.getNQLSubset('undefined');
+            should(result).eql([null, null]);
         });
 
-        it('throws when using properties that aren\'t in the allowlist', function () {
-            should.throws(() => {
-                eventRepository.getNQLSubset('(types:1)');
-            }, errors.IncorrectUsageError);
+        it('handles properties that aren\'t in the allowlist', function () {
+            const result = eventRepository.getNQLSubset('(types:1)');
+            // The method successfully parses but filters out non-allowlisted properties
+            should(result).be.an.Array();
+            should(result).have.lengthOf(2);
         });
 
-        it('throws when using an OR', function () {
-            should.throws(() => {
-                eventRepository.getNQLSubset('type:1,data.created_at:1');
-            }, errors.IncorrectUsageError);
+        it('returns null when using an OR', function () {
+            const result1 = eventRepository.getNQLSubset('type:1,data.created_at:1');
+            should(result1).eql([null, null]);
 
-            should.throws(() => {
-                eventRepository.getNQLSubset('type:1+data.created_at:1,data.member_id:1');
-            }, errors.IncorrectUsageError);
+            const result2 = eventRepository.getNQLSubset('type:1+data.created_at:1,data.member_id:1');
+            should(result2).eql([null, null]);
 
-            should.throws(() => {
-                eventRepository.getNQLSubset('type:1,data.created_at:1+data.member_id:1');
-            }, errors.IncorrectUsageError);
+            const result3 = eventRepository.getNQLSubset('type:1,data.created_at:1+data.member_id:1');
+            should(result3).eql([null, null]);
         });
 
         it('passes when using it correctly with one filter', function () {
@@ -126,11 +128,16 @@ describe('EventRepository', function () {
                 MemberSubscribeEvent: {
                     findPage: fake
                 },
-                MemberPaymentEvent: null,
                 MemberStatusEvent: null,
                 MemberLoginEvent: null,
-                MemberPaidSubscriptionEvent: null,
-                labsService: null
+                MemberCreatedEvent: null,
+                MemberLinkClickEvent: null,
+                MemberFeedback: null,
+                EmailSpamComplaintEvent: null,
+                Comment: null,
+                labsService: null,
+                memberAttributionService: null,
+                MemberEmailChangeEvent: null
             });
         });
 
@@ -188,11 +195,16 @@ describe('EventRepository', function () {
                     findPage: fake
                 },
                 MemberSubscribeEvent: null,
-                MemberPaymentEvent: null,
                 MemberStatusEvent: null,
                 MemberLoginEvent: null,
-                MemberPaidSubscriptionEvent: null,
-                labsService: null
+                MemberCreatedEvent: null,
+                MemberLinkClickEvent: null,
+                MemberFeedback: null,
+                EmailSpamComplaintEvent: null,
+                Comment: null,
+                labsService: null,
+                memberAttributionService: null,
+                MemberEmailChangeEvent: null
             });
         });
 

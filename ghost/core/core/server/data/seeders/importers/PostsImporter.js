@@ -6,7 +6,7 @@ const dateToDatabaseString = require('../utils/database-date');
 
 class PostsImporter extends TableImporter {
     static table = 'posts';
-    static dependencies = ['newsletters'];
+    static dependencies = [];
     defaultQuantity = faker.datatype.number({
         min: 80,
         max: 120
@@ -19,8 +19,7 @@ class PostsImporter extends TableImporter {
     }
 
     async import(quantity = this.defaultQuantity) {
-        this.newsletters = await this.transaction.select('id').from('newsletters').orderBy('sort_order');
-
+        // Newsletters removed - no longer needed
         await super.import(quantity);
     }
 
@@ -92,8 +91,8 @@ class PostsImporter extends TableImporter {
             }),
             html: content.map(paragraph => `<p>${paragraph}</p>`).join(''),
             plaintext: content.join('\n\n'),
-            email_recipient_filter: 'all',
-            newsletter_id: this.type === 'post' && status === 'published' && luck(90) ? (visibility === 'paid' ? this.newsletters[0].id : this.newsletters[1].id) : null
+            email_recipient_filter: 'all'
+            // newsletter_id removed - newsletters feature deprecated
         };
     }
 }

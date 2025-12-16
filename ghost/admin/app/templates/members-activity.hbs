@@ -33,7 +33,7 @@
                     <GhMemberDetailsActivity @member={{this.memberRecord}} />
                 {{/if}}
                 <div class="gh-list-scrolling">
-                    <MembersActivity::Table @hideMemberColumn={{if this.member true}} @events={{eventsFetcher.data}} @hasMultipleNewsletters={{eventsFetcher.hasMultipleNewsletters}} />
+                    <MembersActivity::Table @hideMemberColumn={{if this.member true}} @events={{eventsFetcher.data}} />
 
                     {{#if (not (or eventsFetcher.isLoading eventsFetcher.hasReachedEnd))}}
                         <GhScrollTrigger @enter={{eventsFetcher.loadNextPage}} @triggerOffset={{250}} />

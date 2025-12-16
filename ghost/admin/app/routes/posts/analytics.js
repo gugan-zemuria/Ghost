@@ -17,7 +17,7 @@ export default class Analytics extends AuthenticatedRoute {
                 'authors.roles',
                 'email',
                 'tiers',
-                'newsletter',
+                // Newsletter feature removed
                 'count.conversions',
                 'count.clicks',
                 'sentiment',

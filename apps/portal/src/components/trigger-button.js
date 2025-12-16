@@ -9,7 +9,7 @@ import {ReactComponent as ButtonIcon3} from '../images/icons/button-icon-3.svg';
 import {ReactComponent as ButtonIcon4} from '../images/icons/button-icon-4.svg';
 import {ReactComponent as ButtonIcon5} from '../images/icons/button-icon-5.svg';
 import TriggerButtonStyle from './trigger-button.styles';
-import {hasAvailablePrices, isInviteOnly, isSigninAllowed} from '../utils/helpers';
+import {isInviteOnly, isSigninAllowed} from '../utils/helpers';
 import {hasMode} from '../utils/check-mode';
 
 const ICON_MAPPING = {
@@ -176,7 +176,7 @@ class TriggerButtonContent extends React.Component {
         }
 
         if (isSigninAllowed({site})) {
-            const page = isInviteOnly({site}) || !hasAvailablePrices({site}) ? 'signin' : 'signup';
+            const page = isInviteOnly({site}) ? 'signin' : 'signup';
             this.context.doAction('openPopup', {page});
             return;
         }

@@ -9,7 +9,7 @@ const emberDataTypeMapping = {
     IntegrationsResponseType: {type: 'integration'},
     InvitesResponseType: {type: 'invite'},
     OffersResponseType: {type: 'offer'},
-    NewslettersResponseType: {type: 'newsletter'},
+    // Newsletter feature removed
     RecommendationResponseType: {type: 'recommendation'},
     SettingsResponseType: {type: 'setting', singleton: true},
     ThemesResponseType: {type: 'theme'},

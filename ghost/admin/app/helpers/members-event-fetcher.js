@@ -18,10 +18,7 @@ export default class MembersEventsFetcher extends Resource {
     @tracked errorMessage = null;
     @tracked hasReachedEnd = false;
 
-    /**
-     * Keep track whether we have multiple newsletters (required for parsing events)
-    */
-    @tracked hasMultipleNewsletters = null;
+    // Newsletter feature removed
 
     cursor = null;
 
@@ -33,7 +30,7 @@ export default class MembersEventsFetcher extends Resource {
             data: this.data,
             loadNextPage: this.loadNextPage,
             hasReachedEnd: this.hasReachedEnd,
-            hasMultipleNewsletters: this.hasMultipleNewsletters
+            // Newsletter feature removed
         };
     }
 
@@ -48,7 +45,7 @@ export default class MembersEventsFetcher extends Resource {
         // Can't get this working with Promise.all, somehow results in an infinite loop
         try {
             await this.loadEventsTask.perform({filter});
-            await this.loadMultipleNewslettersTask.perform();
+            // Newsletter feature removed
         } catch (e) {
             if (!didCancel(e)) {
                 // re-throw the non-cancelation error
@@ -84,21 +81,7 @@ export default class MembersEventsFetcher extends Resource {
         this.loadEventsTask.perform({filter});
     }
 
-    /**
-     * We need to know whether we have multiple newsletters so we can hide/show the newsletter name
-     */
-    @task
-    *loadMultipleNewslettersTask() {
-        try {
-            const res = yield this.store.query('newsletter', {filter: 'status:active', include: 'none', limit: 1});
-            const newsletterCount = res.meta.pagination.total;
-            this.hasMultipleNewsletters = newsletterCount > 1;
-        } catch (e) {
-            // Default to true (harms the least)
-            this.hasMultipleNewsletters = true;
-            console.error(e); // eslint-disable-line
-        }
-    }
+    // Newsletter feature removed
 
     @task
     *loadEventsTask(queryParams) {

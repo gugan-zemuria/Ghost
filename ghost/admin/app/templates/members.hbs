@@ -149,12 +149,10 @@
                         <VerticalCollection @tagName="tbody" @items={{this.members}} @key="id" @containerSelector=".gh-list-scrolling" @estimateHeight={{75}} @staticHeight={{true}} @bufferSize={{5}} @renderAll={{false}} as |member|>
                             {{#if member.is_loading}}
                                 <Members::ListItemLoading
-                                    @newsletterEnabled={{and (not-eq this.settings.editorDefaultEmailRecipients "disabled") this.settings.emailTrackOpens}}
                                     @filterColumns={{this.filterColumns}}
                                 />
                             {{else}}
                                 <Members::ListItem
-                                    @newsletterEnabled={{and (not-eq this.settings.editorDefaultEmailRecipients "disabled") this.settings.emailTrackOpens}}
                                     @member={{member.content}}
                                     @filterColumns={{this.filterColumns}}
                                     @query={{hash postAnalytics=this.postAnalytics}}

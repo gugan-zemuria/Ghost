@@ -136,7 +136,8 @@ describe('{{#get}} helper', function () {
         });
     });
 
-    describe('newsletters', function () {
+    describe.skip('newsletters', function () {
+        // Newsletter feature removed
         const meta = {pagination: {}};
 
         beforeEach(function () {

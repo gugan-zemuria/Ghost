@@ -347,7 +347,8 @@ describe('Migration Fixture Utils', function () {
             }).catch(done);
         });
 
-        it('should call add for main newsletter fixture', function (done) {
+        it.skip('should call add for main newsletter fixture', function (done) {
+            // Newsletter model removed
             const newsletterOneStub = sinon.stub(models.Newsletter, 'findOne').returns(Promise.resolve());
             const newsletterAddStub = sinon.stub(models.Newsletter, 'add').returns(Promise.resolve({}));
 
@@ -409,7 +410,7 @@ describe('Migration Fixture Utils', function () {
             const rolesAllStub = sinon.stub(models.Role, 'findAll').returns(Promise.resolve(dataMethodStub));
 
             fixtureManager.addFixturesForRelation(fixtures.relations[0]).then(function (result) {
-                const FIXTURE_COUNT = 135;
+                const FIXTURE_COUNT = 130; // Updated after removing payment-related permissions
                 should.exist(result);
                 result.should.be.an.Object();
                 result.should.have.property('expected', FIXTURE_COUNT);

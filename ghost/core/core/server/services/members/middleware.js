@@ -7,13 +7,11 @@ const models = require('../../models');
 const urlUtils = require('../../../shared/url-utils');
 const spamPrevention = require('../../web/shared/middleware/api/spam-prevention');
 const {
-    formattedMemberResponse,
-    formatNewsletterResponse
+    formattedMemberResponse
 } = require('./utils');
 const errors = require('@tryghost/errors');
 const tpl = require('@tryghost/tpl');
 const onHeaders = require('on-headers');
-const tiersService = require('../tiers/service');
 const config = require('../../../shared/config');
 const settingsHelpers = require('../settings-helpers');
 
@@ -24,9 +22,9 @@ const messages = {
 };
 
 const getFreeTier = async function getFreeTier() {
-    const response = await tiersService.api.browse();
-    const freeTier = response.data.find(tier => tier.type === 'free');
-    return freeTier;
+    // Tiers service removed - get free tier directly from products model
+    const freeTier = await models.Product.findOne({type: 'free'});
+    return freeTier ? {id: freeTier.id, type: 'free'} : null;
 };
 
 /**
@@ -248,63 +246,25 @@ const deleteSuppression = async function deleteSuppression(req, res) {
 };
 
 const getMemberNewsletters = async function getMemberNewsletters(req, res) {
-    try {
-        const memberData = req.member; // validation assumed
-
-        if (!memberData) {
-            res.writeHead(404);
-            return res.end('Email address not found.');
-        }
-
-        const data = _.pick(memberData, 'uuid', 'email', 'name', 'newsletters', 'enable_comment_notifications', 'status');
-
-        if (data.newsletters) {
-            data.newsletters = formatNewsletterResponse(data.newsletters);
-        }
-
-        return res.json(data);
-    } catch (err) {
-        res.writeHead(400);
-        res.end('Failed to unsubscribe this email address');
-    }
+    // Newsletter feature removed
+    res.writeHead(404);
+    return res.end('Newsletter feature has been removed.');
 };
 
 const updateMemberNewsletters = async function updateMemberNewsletters(req, res) {
-    try {
-        const memberData = req.member; // validation assumed
-        if (!memberData) {
-            res.writeHead(404);
-            return res.end('Email address not found.');
-        }
-
-        const data = _.pick(req.body, 'newsletters', 'enable_comment_notifications');
-        const options = {
-            id: memberData.id,
-            withRelated: ['newsletters']
-        };
-
-        const updatedMember = await membersService.api.members.update(data, options);
-        const updatedMemberData = _.pick(updatedMember.toJSON(), ['uuid', 'email', 'name', 'newsletters', 'enable_comment_notifications', 'status']);
-
-        if (updatedMemberData.newsletters) {
-            updatedMemberData.newsletters = formatNewsletterResponse(updatedMemberData.newsletters);
-        }
-
-        res.json(updatedMemberData);
-    } catch (err) {
-        res.writeHead(400);
-        res.end('Failed to update newsletters');
-    }
+    // Newsletter feature removed
+    res.writeHead(404);
+    return res.end('Newsletter feature has been removed.');
 };
 
 const updateMemberData = async function updateMemberData(req, res) {
     try {
-        const data = _.pick(req.body, 'name', 'expertise', 'subscribed', 'newsletters', 'enable_comment_notifications');
+        const data = _.pick(req.body, 'name', 'expertise', 'subscribed', 'enable_comment_notifications');
         const member = await membersService.ssr.getMemberDataFromSession(req, res);
         if (member) {
             const options = {
                 id: member.id,
-                withRelated: ['stripeSubscriptions', 'stripeSubscriptions.customer', 'stripeSubscriptions.stripePrice', 'newsletters']
+                withRelated: ['stripeSubscriptions', 'stripeSubscriptions.customer', 'stripeSubscriptions.stripePrice']
             };
             await membersService.api.members.update(data, options);
             const updatedMember = await membersService.ssr.getMemberDataFromSession(req, res);

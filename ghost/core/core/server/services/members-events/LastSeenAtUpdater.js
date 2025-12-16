@@ -144,7 +144,7 @@ class LastSeenAtUpdater {
                     const currentMember = await membersApi.members.get({id: memberId}, {require: true, transacting: trx, forUpdate: true});
                     const currentMemberLastSeenAt = currentMember.get('last_seen_at');
                     if (currentMemberLastSeenAt === null || moment(moment.utc(timestamp).tz(timezone).startOf('day')).isAfter(currentMemberLastSeenAt)) {
-                        const memberToUpdate = await currentMember.refresh({transacting: trx, forUpdate: false, withRelated: ['labels', 'newsletters']});
+                        const memberToUpdate = await currentMember.refresh({transacting: trx, forUpdate: false, withRelated: ['labels']});
                         const updatedMember = await memberToUpdate.save({last_seen_at: moment.utc(timestamp).format('YYYY-MM-DD HH:mm:ss')}, {transacting: trx, patch: true, method: 'update'});
                         // The standard event doesn't get emitted inside the transaction, so we do it manually
                         this._events.emit('member.edited', updatedMember);

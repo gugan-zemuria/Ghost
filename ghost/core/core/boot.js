@@ -193,11 +193,6 @@ async function initServicesForFrontend({bootLogger}) {
     bootLogger.metric('theme-service-init', themeServiceStart);
     debug('End: Themes');
 
-    debug('Begin: Offers');
-    const offers = require('./server/services/offers');
-    await offers.init();
-    debug('End: Offers');
-
     const frontendDataService = require('./server/services/frontend-data-service');
     let dataService = await frontendDataService.init();
 
@@ -311,9 +306,7 @@ async function initServices() {
 
     debug('Begin: Services');
     const identityTokens = require('./server/services/identity-tokens');
-    const stripe = require('./server/services/stripe');
     const members = require('./server/services/members');
-    const tiers = require('./server/services/tiers');
     const permissions = require('./server/services/permissions');
     const xmlrpc = require('./server/services/xmlrpc');
     const slack = require('./server/services/slack');
@@ -334,17 +327,12 @@ async function initServices() {
     const postsPublic = require('./server/services/posts-public');
     const slackNotifications = require('./server/services/slack-notifications');
     const mediaInliner = require('./server/services/media-inliner');
-    const donationService = require('./server/services/donations');
     const recommendationsService = require('./server/services/recommendations');
     const emailAddressService = require('./server/services/email-address');
     const statsService = require('./server/services/stats');
     const explorePingService = require('./server/services/explore-ping');
 
     const urlUtils = require('./shared/url-utils');
-
-    // NOTE: Members service depends on these
-    //       so they are initialized before it.
-    await stripe.init();
 
     // NOTE: newsletter service and email service depend on email address service
     await emailAddressService.init(),
@@ -356,7 +344,6 @@ async function initServices() {
         mentionsEmailReport.init(),
         staffService.init(),
         members.init(),
-        tiers.init(),
         tagsPublic.init(),
         postsPublic.init(),
         membersEvents.init(),
@@ -375,7 +362,6 @@ async function initServices() {
         emailSuppressionList.init(),
         slackNotifications.init(),
         mediaInliner.init(),
-        donationService.init(),
         recommendationsService.init(),
         statsService.init(),
         explorePingService.init()

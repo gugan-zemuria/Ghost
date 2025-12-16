@@ -16,7 +16,6 @@ const lexicalLib = require('../lib/lexical');
 const relations = require('./relations');
 const urlUtils = require('../../shared/url-utils');
 const {Tag} = require('./tag');
-const {Newsletter} = require('./newsletter');
 const {BadRequestError} = require('@tryghost/errors');
 const {mobiledocToLexical} = require('@tryghost/kg-converters');
 const {setIsRoles} = require('./role-utils');
@@ -27,7 +26,6 @@ const messages = {
     expectedPublishedAtInFuture: 'Date must be at least {cannotScheduleAPostBeforeInMinutes} minutes in the future.',
     untitled: '(Untitled)',
     notEnoughPermission: 'You do not have permission to perform this action',
-    invalidNewsletter: 'The newsletter parameter doesn\'t match any active newsletter.',
     invalidMobiledocStructure: 'Invalid mobiledoc structure.',
     invalidMobiledocStructureHelp: 'https://ghost.org/docs/publishing/',
     invalidLexicalStructure: 'Invalid lexical structure.',
@@ -776,31 +774,7 @@ Post = ghostBookshelf.Model.extend({
             }
         }
 
-        // newsletter_id is read-only and should only be set using the newsletter param when publishing/scheduling
-        if (options.newsletter
-            && !this.get('newsletter_id')
-            && this.hasChanged('status')
-            && (newStatus === 'published' || newStatus === 'scheduled' || newStatus === 'sent')) {
-            // Map the passed slug to the id + validate the passed newsletter
-            ops.push(async () => {
-                const newsletter = await Newsletter.findOne({slug: options.newsletter}, {transacting: options.transacting, filter: 'status:active'});
-                if (!newsletter) {
-                    throw new BadRequestError({
-                        message: messages.invalidNewsletter
-                    });
-                }
-                this.set('newsletter_id', newsletter.id);
-            });
-
-            // If the `email_segment` isn't passed at the same time, reset it to be 100% sure that they can only be used together
-            this.set('email_recipient_filter', 'all');
-
-            // email_segment is read-only and should only be set using a query param when publishing/scheduling
-            // we can't set it if we don't pass newsletter
-            if (options.email_segment) {
-                this.set('email_recipient_filter', options.email_segment);
-            }
-        }
+        // Newsletter feature removed - newsletter_id handling disabled
 
         // ensure draft posts have the email_recipient_filter reset unless an email has already been sent
         if (newStatus === 'draft' && this.hasChanged('status')) {
@@ -808,14 +782,12 @@ Post = ghostBookshelf.Model.extend({
                 return self.getLazyRelation('email', {transacting: options.transacting}).then((email) => {
                     if (!email) {
                         self.set('email_recipient_filter', 'all');
-                        self.set('newsletter_id', null);
                     }
                 });
             });
         }
 
         // NOTE: this is a stopgap solution for email-only posts where their status is unchanged after publish
-        //       but the usual publis/send newsletter flow continues
         const hasEmailOnlyFlag = _.get(attrs, 'posts_meta.email_only') || model.related('posts_meta').get('email_only');
         if (hasEmailOnlyFlag && (newStatus === 'published') && this.hasChanged('status')) {
             this.set('status', 'sent');
@@ -1009,10 +981,6 @@ Post = ghostBookshelf.Model.extend({
         return this.hasOne('Email', 'post_id');
     },
 
-    newsletter: function newsletter() {
-        return this.belongsTo('Newsletter', 'newsletter_id');
-    },
-
     /**
      * @NOTE:
      * If you are requesting models with `columns`, you try to only receive some fields of the model/s.
@@ -1204,7 +1172,7 @@ Post = ghostBookshelf.Model.extend({
 
             findAll: ['columns', 'filter'],
             destroy: ['destroyAll', 'destroyBy'],
-            edit: ['filter', 'email_segment', 'force_rerender', 'newsletter', 'save_revision', 'convert_to_lexical']
+            edit: ['filter', 'email_segment', 'force_rerender', 'save_revision', 'convert_to_lexical']
         };
 
         // The post model additionally supports having a formats option
@@ -1459,10 +1427,8 @@ Post = ghostBookshelf.Model.extend({
             },
             paid_conversions(modelOrCollection) {
                 modelOrCollection.query('columns', 'posts.*', (qb) => {
-                    qb.count('members_subscription_created_events.id')
-                        .from('members_subscription_created_events')
-                        .whereRaw('posts.id = members_subscription_created_events.attribution_id')
-                        .as('count__paid_conversions');
+                    // Payment features removed - return 0 for paid conversions
+                    qb.select(qb.client.raw('0 as count__paid_conversions'));
                 });
             },
             /**
@@ -1470,19 +1436,8 @@ Post = ghostBookshelf.Model.extend({
              */
             conversions(modelOrCollection) {
                 modelOrCollection.query('columns', 'posts.*', (qb) => {
-                    qb.count('*')
-                        .from('k')
-                        .with('k', (q) => {
-                            q.select('member_id')
-                                .from('members_subscription_created_events')
-                                .whereRaw('posts.id = members_subscription_created_events.attribution_id')
-                                .union(function () {
-                                    this.select('member_id')
-                                        .from('members_created_events')
-                                        .whereRaw('posts.id = members_created_events.attribution_id');
-                                });
-                        })
-                        .as('count__conversions');
+                    // Since payments are removed, conversions = signups only
+                    qb.select(qb.client.raw('(select count(members_created_events.id) from members_created_events where posts.id = members_created_events.attribution_id) as count__conversions'));
                 });
             },
             clicks(modelOrCollection) {

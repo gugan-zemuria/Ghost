@@ -195,9 +195,7 @@ const LatestPost: React.FC<LatestPostProps> = ({
                                 {metricsToShow.showEmailMetrics && latestPostStats.email && (
                                     <>
                                         {emailTrackOpensEnabled && (
-                                            <div className={metricClassName} onClick={() => {
-                                                navigate(`/posts/analytics/${latestPostStats.id}/newsletter`, {crossApp: true});
-                                            }}>
+                                            <div className={metricClassName}>
                                                 <div className='flex items-center gap-1.5 font-medium text-muted-foreground transition-all group-hover:text-foreground'>
                                                     <LucideIcon.MailOpen size={16} strokeWidth={1.25} />
                                                     <span className='hidden whitespace-nowrap md:!visible md:!block'>Opens</span>
@@ -211,9 +209,7 @@ const LatestPost: React.FC<LatestPostProps> = ({
                                             </div>
                                         )}
                                         {emailTrackClicksEnabled && (
-                                            <div className={metricClassName} onClick={() => {
-                                                navigate(`/posts/analytics/${latestPostStats.id}/newsletter`, {crossApp: true});
-                                            }}>
+                                            <div className={metricClassName}>
                                                 <div className='flex items-center gap-1.5 font-medium text-muted-foreground transition-all group-hover:text-foreground'>
                                                     <LucideIcon.MousePointerClick size={16} strokeWidth={1.25} />
                                                     <span className='hidden whitespace-nowrap md:!visible md:!block'>Clicks</span>

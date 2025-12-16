@@ -160,17 +160,12 @@ module.exports = class MembersCSVImporter {
                 };
                 const existingMember = await membersRepository.get({email: memberValues.email}, {
                     ...options,
-                    withRelated: ['labels', 'newsletters']
+                    withRelated: ['labels']
                 });
                 let member;
                 if (existingMember) {
                     const existingLabels = existingMember.related('labels') ? existingMember.related('labels').toJSON() : [];
-                    const existingNewsletters = existingMember.related('newsletters');
-
-                    // Preserve member's existing newsletter subscription preferences
-                    if (existingNewsletters.length > 0 && memberValues.subscribed) {
-                        memberValues.newsletters = existingNewsletters.toJSON();
-                    }
+                    // Newsletter feature removed
 
                     // If member does not have any subscriptions, assume they have previously unsubscribed
                     // and do not re-subscribe them

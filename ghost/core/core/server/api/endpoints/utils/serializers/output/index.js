@@ -69,9 +69,10 @@ module.exports = {
         return require('./members');
     },
 
-    get tiers() {
-        return require('./tiers');
-    },
+    // Payment feature removed
+    // get tiers() {
+    //     return require('./tiers');
+    // },
 
     get images() {
         return require('./images');
@@ -129,9 +130,10 @@ module.exports = {
         return require('./session');
     },
 
-    get members_stripe_connect() {
-        return require('./members-stripe-connect');
-    },
+    // Payment feature removed
+    // get members_stripe_connect() {
+    //     return require('./members-stripe-connect');
+    // },
 
     get links() {
         return require('./links');

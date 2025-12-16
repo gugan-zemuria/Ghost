@@ -76,11 +76,7 @@ const StatsHeader:React.FC<StatsHeaderProps> = ({
                         }}>Web traffic</PageMenuItem>
                     }
 
-                    {appSettings?.newslettersEnabled &&
-                        <PageMenuItem value="/analytics/newsletters/" onClick={() => {
-                            navigate('/analytics/newsletters/');
-                        }}>Newsletters</PageMenuItem>
-                    }
+
 
                     <PageMenuItem value="/analytics/growth/" onClick={() => {
                         navigate('/analytics/growth/');

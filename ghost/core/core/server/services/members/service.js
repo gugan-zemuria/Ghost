@@ -15,17 +15,12 @@ const config = require('../../../shared/config');
 const models = require('../../models');
 const {GhostMailer} = require('../mail');
 const jobsService = require('../jobs');
-const tiersService = require('../tiers');
 const VerificationTrigger = require('../VerificationTrigger');
 const DatabaseInfo = require('@tryghost/database-info');
 const settingsHelpers = require('../settings-helpers');
 const RequestIntegrityTokenProvider = require('./RequestIntegrityTokenProvider');
 
-const messages = {
-    noLiveKeysInDevelopment: 'Cannot use live stripe keys in development. Please restart in production mode.',
-    sslRequiredForStripe: 'Cannot run Ghost without SSL when Stripe is connected. Please update your url config to use "https://".',
-    remoteWebhooksInDevelopment: 'Cannot use remote webhooks in development. See https://ghost.org/docs/webhooks/#stripe-webhooks for developing with Stripe.'
-};
+const messages = {};
 
 const ghostMailer = new GhostMailer();
 
@@ -43,7 +38,7 @@ const membersStats = new MembersStats({
 
 let membersApi;
 
-const initMembersCSVImporter = ({stripeAPIService}) => {
+const initMembersCSVImporter = () => {
     return makeMembersCSVImporter({
         storagePath: config.getContentPath('data'),
         getTimezone: () => settingsCache.get('timezone'),
@@ -52,22 +47,11 @@ const initMembersCSVImporter = ({stripeAPIService}) => {
             return api.members;
         },
         getDefaultTier: () => {
-            return tiersService.api.readDefaultTier();
+            // Tiers/payment service removed - return null
+            return null;
         },
-        getTierByName: async (name) => {
-            const tiers = await tiersService.api.browse({
-                filter: {
-                    name
-                }
-            });
-
-            if (tiers.data.length > 0) {
-                // It is possible that there are multiple tiers with the same name so return the last one in the array -
-                // `tiersService.api.browse` returns all tiers, but without any ordering applied, so we assume that
-                // the last one in the array is the most recently created
-                return tiers.data.pop();
-            }
-
+        getTierByName: async () => {
+            // Tiers/payment service removed - return null
             return null;
         },
         sendEmail: ghostMailer.send.bind(ghostMailer),
@@ -78,8 +62,8 @@ const initMembersCSVImporter = ({stripeAPIService}) => {
         context: {
             importer: true
         },
-        stripeAPIService,
-        productRepository: membersApi.productRepository
+        stripeAPIService: null,
+        productRepository: membersApi ? membersApi.productRepository : null
     });
 };
 
@@ -117,25 +101,7 @@ const initVerificationTrigger = () => {
 
 module.exports = {
     async init() {
-        const stripeService = require('../stripe');
         const createMembersApiInstance = require('./api');
-        const env = config.get('env');
-
-        // @TODO Move to stripe service
-        if (env !== 'production') {
-            if (stripeService.api.configured && stripeService.api.mode === 'live') {
-                throw new errors.IncorrectUsageError({
-                    message: tpl(messages.noLiveKeysInDevelopment)
-                });
-            }
-        } else {
-            const siteUrl = urlUtils.getSiteUrl();
-            if (!/^https/.test(siteUrl) && stripeService.api.configured) {
-                throw new errors.IncorrectUsageError({
-                    message: tpl(messages.sslRequiredForStripe)
-                });
-            }
-        }
 
         if (!membersApi) {
             membersApi = createMembersApiInstance(membersConfig);
@@ -155,23 +121,10 @@ module.exports = {
         const verificationTrigger = initVerificationTrigger();
         module.exports.verificationTrigger = verificationTrigger;
 
-        const membersCSVImporter = initMembersCSVImporter({stripeAPIService: stripeService.api});
+        const membersCSVImporter = initMembersCSVImporter();
         module.exports.processImport = async (options) => {
             return await membersCSVImporter.process({...options, verificationTrigger});
         };
-
-        if (!env?.startsWith('testing')) {
-            const membersMigrationJobName = 'members-migrations';
-            if (!(await jobsService.hasExecutedSuccessfully(membersMigrationJobName))) {
-                jobsService.addOneOffJob({
-                    name: membersMigrationJobName,
-                    offloaded: false,
-                    job: stripeService.migrations.execute.bind(stripeService.migrations)
-                });
-
-                await jobsService.awaitOneOffCompletion(membersMigrationJobName);
-            }
-        }
 
         // Schedule daily cron job to clean expired comp subs
         memberJobs.scheduleExpiredCompCleanupJob();
@@ -194,8 +147,6 @@ module.exports = {
         themeSecret: settingsCache.get('theme_session_secret'),
         tokenDuration: 1000 * 60 * 5
     }),
-
-    stripeConnect: require('./stripe-connect'),
 
     processImport: null,
 

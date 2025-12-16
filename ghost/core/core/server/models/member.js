@@ -42,24 +42,15 @@ const Member = ghostBookshelf.Model.extend({
         }, {
             key: 'tier_id',
             replacement: 'products.id'
-        },{
-            key: 'newsletters',
-            replacement: 'newsletters.slug'
         }, {
             key: 'signup',
             replacement: 'signups.attribution_id'
-        }, {
-            key: 'conversion',
-            replacement: 'conversions.attribution_id'
         }, {
             key: 'opened_emails.post_id',
             replacement: 'emails.post_id',
             // Currently we cannot expand on values such as null or a string in mongo-knex
             // But the line below is essentially the same as: `email_recipients.opened_at:-null`
             expansion: 'email_recipients.opened_at:>=0'
-        }, {
-            key: 'offer_redemptions',
-            replacement: 'offer_redemptions.offer_id'
         }];
     },
 
@@ -79,31 +70,9 @@ const Member = ghostBookshelf.Model.extend({
                 joinFrom: 'member_id',
                 joinTo: 'product_id'
             },
-            newsletters: {
-                tableName: 'newsletters',
-                type: 'manyToMany',
-                joinTable: 'members_newsletters',
-                joinFrom: 'member_id',
-                joinTo: 'newsletter_id'
-            },
-            subscriptions: {
-                tableName: 'members_stripe_customers_subscriptions',
-                tableNameAs: 'subscriptions',
-                type: 'manyToMany',
-                joinTable: 'members_stripe_customers',
-                joinFrom: 'member_id',
-                joinTo: 'customer_id',
-                joinToForeign: 'customer_id'
-            },
             signups: {
                 tableName: 'members_created_events',
                 tableNameAs: 'signups',
-                type: 'oneToOne',
-                joinFrom: 'member_id'
-            },
-            conversions: {
-                tableName: 'members_subscription_created_events',
-                tableNameAs: 'conversions',
                 type: 'oneToOne',
                 joinFrom: 'member_id'
             },
@@ -128,16 +97,11 @@ const Member = ghostBookshelf.Model.extend({
                 tableNameAs: 'feedback',
                 type: 'oneToOne',
                 joinFrom: 'member_id'
-            },
-            offer_redemptions: {
-                tableName: 'offer_redemptions',
-                type: 'oneToOne',
-                joinFrom: 'member_id'
             }
         };
     },
 
-    relationships: ['products', 'labels', 'stripeCustomers', 'email_recipients', 'newsletters'],
+    relationships: ['products', 'labels', 'email_recipients'],
 
     // do not delete email_recipients records when a member is destroyed. Recipient
     // records are used for analytics and historical records
@@ -155,11 +119,8 @@ const Member = ghostBookshelf.Model.extend({
 
     relationshipBelongsTo: {
         products: 'products',
-        newsletters: 'newsletters',
         labels: 'labels',
-        stripeCustomers: 'members_stripe_customers',
-        email_recipients: 'email_recipients',
-        offers: 'offers'
+        email_recipients: 'email_recipients'
     },
 
     productEvents() {
@@ -178,21 +139,6 @@ const Member = ghostBookshelf.Model.extend({
             });
     },
 
-    newsletters() {
-        return this.belongsToMany('Newsletter', 'members_newsletters', 'member_id', 'newsletter_id')
-            .query('orderBy', 'newsletters.sort_order', 'ASC')
-            .query((qb) => {
-                // avoids bookshelf adding a `DISTINCT` to the query
-                // we know the result set will already be unique and DISTINCT hurts query performance
-                qb.columns('newsletters.*');
-            });
-    },
-
-    offerRedemptions() {
-        return this.hasMany('OfferRedemption', 'member_id', 'id')
-            .query('orderBy', 'created_at', 'DESC');
-    },
-
     labels: function labels() {
         return this.belongsToMany('Label', 'members_labels', 'member_id', 'label_id')
             .withPivot('sort_order')
@@ -202,21 +148,6 @@ const Member = ghostBookshelf.Model.extend({
                 // we know the result set will already be unique and DISTINCT hurts query performance
                 qb.columns('labels.*');
             });
-    },
-
-    stripeCustomers() {
-        return this.hasMany('MemberStripeCustomer', 'member_id', 'id');
-    },
-
-    stripeSubscriptions() {
-        return this.belongsToMany(
-            'StripeCustomerSubscription',
-            'members_stripe_customers',
-            'member_id',
-            'customer_id',
-            'id',
-            'customer_id'
-        );
     },
 
     email_recipients() {
@@ -237,12 +168,6 @@ const Member = ghostBookshelf.Model.extend({
 
     serialize(options) {
         const defaultSerializedObject = ghostBookshelf.Model.prototype.serialize.call(this, options);
-
-        if (defaultSerializedObject.stripeSubscriptions) {
-            defaultSerializedObject.subscriptions = defaultSerializedObject.stripeSubscriptions;
-            delete defaultSerializedObject.stripeSubscriptions;
-        }
-
         return defaultSerializedObject;
     },
 
@@ -473,15 +398,10 @@ const Member = ghostBookshelf.Model.extend({
     },
 
     fetchAllSubscribed(unfilteredOptions = {}) {
-        // we use raw queries instead of model relationships because model hydration is expensive
-        const query = ghostBookshelf.knex('members_newsletters')
-            .join('newsletters', 'members_newsletters.newsletter_id', '=', 'newsletters.id')
-            .join('members', 'members_newsletters.member_id', '=', 'members.id')
-            .where({
-                'newsletters.status': 'active',
-                'members.email_disabled': false
-            })
-            .distinct('member_id as id');
+        // Newsletter feature removed - return empty result
+        const query = ghostBookshelf.knex('members')
+            .select('id')
+            .whereRaw('1 = 0'); // Always return empty
 
         if (unfilteredOptions.transacting) {
             query.transacting(unfilteredOptions.transacting);

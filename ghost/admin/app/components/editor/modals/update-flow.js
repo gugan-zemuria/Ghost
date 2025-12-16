@@ -8,14 +8,9 @@ export default class UpdateFlowModalComponent extends Component {
         ignoreBackdropClick: true
     };
 
-    // We only show the newsletter name in the app if there's more than the single default newsletter.
-    // However, here we can show historic email data so it could have been sent to a now-archived
-    // newsletter in which case we want to force display of the newsletter name to avoid confusion.
+    // Newsletter feature removed
     get showNewsletterName() {
-        const {publishOptions} = this.args.data;
-
-        return !publishOptions.onlyDefaultNewsletter
-            || publishOptions.post.newsletter?.status === 'archived';
+        return false;
     }
 
     @task

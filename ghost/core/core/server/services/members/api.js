@@ -1,4 +1,3 @@
-const stripeService = require('../stripe');
 const settingsCache = require('../../../shared/settings-cache');
 const settingsHelpers = require('../../services/settings-helpers');
 const MembersApi = require('./members-api/members-api');
@@ -13,9 +12,6 @@ const updateEmail = require('./emails/update-email');
 const SingleUseTokenProvider = require('./SingleUseTokenProvider');
 const urlUtils = require('../../../shared/url-utils');
 const labsService = require('../../../shared/labs');
-const offersService = require('../offers');
-const tiersService = require('../tiers');
-const newslettersService = require('../newsletters');
 const memberAttributionService = require('../member-attribution');
 const emailSuppressionList = require('../email-suppression-list');
 const {t} = require('../i18n');
@@ -212,27 +208,15 @@ function createApiInstance(config) {
             }
         },
         models: {
-            DonationPaymentEvent: models.DonationPaymentEvent,
             EmailRecipient: models.EmailRecipient,
-            StripeCustomer: models.MemberStripeCustomer,
-            StripeCustomerSubscription: models.StripeCustomerSubscription,
             Member: models.Member,
-            MemberNewsletter: models.MemberNewsletter,
-            MemberCancelEvent: models.MemberCancelEvent,
             MemberSubscribeEvent: models.MemberSubscribeEvent,
-            MemberPaidSubscriptionEvent: models.MemberPaidSubscriptionEvent,
             MemberLoginEvent: models.MemberLoginEvent,
             MemberEmailChangeEvent: models.MemberEmailChangeEvent,
-            MemberPaymentEvent: models.MemberPaymentEvent,
             MemberStatusEvent: models.MemberStatusEvent,
             MemberProductEvent: models.MemberProductEvent,
             MemberCreatedEvent: models.MemberCreatedEvent,
-            SubscriptionCreatedEvent: models.SubscriptionCreatedEvent,
             MemberLinkClickEvent: models.MemberClickEvent,
-            OfferRedemption: models.OfferRedemption,
-            Offer: models.Offer,
-            StripeProduct: models.StripeProduct,
-            StripePrice: models.StripePrice,
             Product: models.Product,
             Settings: models.Settings,
             Comment: models.Comment,
@@ -240,11 +224,7 @@ function createApiInstance(config) {
             EmailSpamComplaintEvent: models.EmailSpamComplaintEvent,
             Outbox: models.Outbox
         },
-        stripeAPIService: stripeService.api,
-        tiersService: tiersService,
-        offersAPI: offersService.api,
         labsService: labsService,
-        newslettersService: newslettersService,
         memberAttributionService: memberAttributionService.service,
         emailSuppressionList,
         settingsCache,

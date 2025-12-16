@@ -3,11 +3,10 @@ import ActionButton from '../common/action-button';
 import AppContext from '../../app-context';
 import CloseButton from '../common/close-button';
 import SiteTitleBackButton from '../common/site-title-back-button';
-import NewsletterSelectionPage from './newsletter-selection-page';
-import ProductsSection from '../common/products-section';
+// Payment and newsletter functionality removed
 import InputForm from '../common/input-form';
 import {ValidateInputForm} from '../../utils/form';
-import {getSiteProducts, getSitePrices, hasAvailablePrices, hasOnlyFreePlan, isInviteOnly, isFreeSignupAllowed, isPaidMembersOnly, freeHasBenefitsOrDescription, hasMultipleNewsletters, hasFreeTrialTier, isSignupAllowed, isSigninAllowed} from '../../utils/helpers';
+import {isInviteOnly, isFreeSignupAllowed, isPaidMembersOnly, isSignupAllowed, isSigninAllowed} from '../../utils/helpers';
 import {ReactComponent as InvitationIcon} from '../../images/icons/invitation.svg';
 import {interceptAnchorClicks} from '../../utils/links';
 import {t} from '../../utils/i18n';
@@ -351,8 +350,7 @@ class SignupPage extends React.Component {
         this.state = {
             name: '',
             email: '',
-            plan: 'free',
-            showNewsletterSelection: false,
+            // Payment plan removed - only free signup available
             termsCheckboxChecked: false
         };
 
@@ -367,25 +365,10 @@ class SignupPage extends React.Component {
             });
         }
 
-        // Handle the default plan if not set
-        this.handleSelectedPlan();
+        // Payment plan handling removed
     }
 
-    componentDidUpdate() {
-        this.handleSelectedPlan();
-    }
-
-    handleSelectedPlan() {
-        const {site, pageQuery} = this.context;
-        const prices = getSitePrices({site, pageQuery});
-
-        const selectedPriceId = this.getSelectedPriceId(prices, this.state.plan);
-        if (selectedPriceId !== this.state.plan) {
-            this.setState({
-                plan: selectedPriceId
-            });
-        }
-    }
+    // Payment plan handling methods removed
 
     componentWillUnmount() {
         clearTimeout(this.timeoutId);
@@ -408,7 +391,7 @@ class SignupPage extends React.Component {
             };
         }, () => {
             const {site, doAction} = this.context;
-            const {name, email, plan, phonenumber, token, errors} = this.state;
+            const {name, email, phonenumber, token, errors} = this.state;
             const hasFormErrors = (errors && Object.values(errors).filter(d => !!d).length > 0);
 
             // Only scroll checkbox into view if it's the only error
@@ -421,18 +404,11 @@ class SignupPage extends React.Component {
             }
 
             if (!hasFormErrors) {
-                if (hasMultipleNewsletters({site})) {
-                    this.setState({
-                        showNewsletterSelection: true,
-                        pageData: {name, email, plan, phonenumber, token},
-                        errors: {}
-                    });
-                } else {
-                    this.setState({
-                        errors: {}
-                    });
-                    doAction('signup', {name, email, phonenumber, plan, token});
-                }
+                // Simplified signup flow - no newsletter selection
+                this.setState({
+                    errors: {}
+                });
+                doAction('signup', {name, email, phonenumber, token});
             }
         });
     }
@@ -457,17 +433,7 @@ class SignupPage extends React.Component {
         });
     }
 
-    handleSelectPlan = (e, priceId) => {
-        e && e.preventDefault();
-        // Hack: React checkbox gets out of sync with dom state with instant update
-        this.timeoutId = setTimeout(() => {
-            this.setState(() => {
-                return {
-                    plan: priceId
-                };
-            });
-        }, 5);
-    };
+    // Payment plan selection removed
 
     onKeyDown(e) {
         // Handles submit on Enter press
@@ -476,20 +442,7 @@ class SignupPage extends React.Component {
         }
     }
 
-    getSelectedPriceId(prices = [], selectedPriceId) {
-        if (!prices || prices.length === 0 || selectedPriceId === 'free') {
-            return 'free';
-        }
-        const hasSelectedPlan = prices.some((p) => {
-            return p.id === selectedPriceId;
-        });
-
-        if (!hasSelectedPlan) {
-            return prices[0].id || 'free';
-        }
-
-        return selectedPriceId;
-    }
+    // Price selection method removed - only free signup available
 
     getInputFields({state, fieldNames}) {
         const {site: {portal_name: portalName}} = this.context;
@@ -687,18 +640,7 @@ class SignupPage extends React.Component {
         const fields = this.getInputFields({state: this.state});
         const {site, pageQuery} = this.context;
 
-        if (this.state.showNewsletterSelection) {
-            return (
-                <NewsletterSelectionPage
-                    pageData={this.state.pageData}
-                    onBack={() => {
-                        this.setState({
-                            showNewsletterSelection: false
-                        });
-                    }}
-                />
-            );
-        }
+        // Simplified signup flow - no newsletter selection
 
         // Invite-only site: block signups, offer to sign in
         if (isInviteOnly({site})) {
@@ -877,13 +819,7 @@ class SignupPage extends React.Component {
                 <div className='gh-portal-back-sitetitle'>
                     <SiteTitleBackButton
                         onBack={() => {
-                            if (this.state.showNewsletterSelection) {
-                                this.setState({
-                                    showNewsletterSelection: false
-                                });
-                            } else {
-                                this.context.doAction('closePopup');
-                            }
+                            this.context.doAction('closePopup');
                         }}
                     />
                 </div>

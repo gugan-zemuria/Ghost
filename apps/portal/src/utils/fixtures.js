@@ -106,22 +106,7 @@ export const site = getSiteData({
     portalButtonStyle: 'icon-and-text',
     membersSupportAddress: 'support@example.com',
     commentsEnabled: true,
-    newsletters: [
-        {
-            id: 'weekly',
-            name: 'Weekly Rundown',
-            description: 'Best of last week',
-            subscribe_on_signup: true,
-            paid: true
-        },
-        {
-            id: 'daily',
-            name: 'Daily Brief',
-            description: 'One email every day',
-            subscribe_on_signup: false,
-            paid: false
-        }
-    ],
+    newsletters: [], // Newsletter functionality removed
     posts: [
         {
             id: 'post_66aacfe061c94e10eb6e4fc1',

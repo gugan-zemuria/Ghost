@@ -8,20 +8,16 @@ import {ActionButtonStyles} from './common/action-button';
 import {BackButtonStyles} from './common/back-button';
 import {SwitchStyles} from './common/switch';
 import AccountHomePageStyles from './pages/AccountHomePage/account-home-page.css?inline';
-import {AccountPlanPageStyles} from './pages/account-plan-page';
+// AccountPlanPageStyles import removed - payment functionality deprecated
 import {InputFieldStyles} from './common/input-field';
 import {SignupPageStyles} from './pages/signup-page';
-import {ProductsSectionStyles} from './common/products-section';
+// ProductsSectionStyles import removed - payment functionality deprecated
 import {AvatarStyles} from './common/member-gravatar';
 import {MagicLinkStyles} from './pages/magic-link-page';
 import {PopupNotificationStyles} from './common/popup-notification';
-import {OfferPageStyles} from './pages/offer-page';
+// OfferPageStyles import removed - payment functionality deprecated
 import {FeedbackPageStyles} from './pages/feedback-page';
-import EmailSuppressedPage from './pages/email-suppressed-page.css?inline';
-import EmailSuppressionFAQ from './pages/email-suppression-faq.css?inline';
-import EmailReceivingFAQ from './pages/email-receiving-faq.css?inline';
-import {TipsAndDonationsSuccessStyle} from './pages/support-success';
-import {TipsAndDonationsErrorStyle} from './pages/support-error';
+// Email page CSS imports removed - functionality deprecated
 import {RecommendationsPageStyles} from './pages/recommendations-page';
 import NotificationStyle from './notification.styles';
 
@@ -364,24 +360,13 @@ html[dir="rtl"] .gh-portal-btn-site-title-back span {
     padding-bottom: 4vw;
 }
 
-.gh-portal-popup-container.full-size.account-plan {
-    justify-content: flex-start;
-    padding-top: 4vw;
-}
+/* Account plan styles removed - payment functionality deprecated */
 
 .gh-portal-popup-container.preview {
     animation: none !important;
 }
 
-.gh-portal-popup-wrapper.preview.offer {
-    padding-top: 0;
-}
-
-.gh-portal-popup-container.preview.offer {
-    max-width: 420px;
-    transform: scale(0.9);
-    margin-top: 3.2vw;
-}
+/* Offer preview styles removed - payment functionality deprecated */
 
 @media (max-width: 480px) {
     .gh-portal-popup-container.preview.offer {
@@ -632,14 +617,7 @@ html[dir="rtl"] .gh-portal-logout-container {
     border: 1px solid var(--grey12);
 }
 
-.gh-portal-newsletter-selection {
-    max-width: 460px;
-    margin: 0 auto;
-}
-
-.gh-portal-newsletter-selection .gh-portal-list {
-    margin-bottom: 40px;
-}
+/* Newsletter selection styles removed - functionality deprecated */
 
 .gh-portal-lock-icon-container {
     display: flex;
@@ -720,9 +698,7 @@ html[dir="rtl"] .gh-portal-list-toggle-wrapper .gh-portal-list-detail {
     padding: 4px 0px 4px 24px;
 }
 
-.gh-portal-list-detail .old-price {
-    text-decoration: line-through;
-}
+/* Price styles removed - payment functionality deprecated */
 
 .gh-portal-right-arrow {
     line-height: 1;
@@ -887,10 +863,7 @@ const MobileStyles = `
         height: 42px;
     }
 
-    .gh-portal-product-price .amount {
-        font-size: 32px;
-        letter-spacing: -0.022em;
-    }
+    /* Product price styles removed - payment functionality deprecated */
 }
 
 @media (max-width: 960px) {
@@ -984,10 +957,7 @@ const MobileStyles = `
         margin-bottom: 0;
     }
 
-    .gh-portal-popup-container.preview:not(.full-size).offer {
-        max-height: 860px;
-        padding-bottom: 0 !important;
-    }
+    /* Offer preview styles removed - payment functionality deprecated */
 
     .gh-portal-popup-wrapper.preview.full-size {
         height: unset;
@@ -1059,6 +1029,7 @@ const MobileStyles = `
 }
 `;
 
+// Multiple products styles removed - payment functionality deprecated
 const MultipleProductsGlobalStyles = `
 .gh-portal-popup-wrapper.multiple-products .gh-portal-input-section {
     max-width: 420px;
@@ -1167,33 +1138,7 @@ const MultipleProductsGlobalStyles = `
     pointer-events: none !important;
 }
 
-.gh-portal-unsubscribe-logo {
-    width: 60px;
-    height: 60px;
-    border-radius: 2px;
-    margin-top: 12px;
-    margin-bottom: 6px;
-}
-
-@media (max-width: 480px) {
-    .gh-portal-unsubscribe-logo {
-        width: 48px;
-        height: 48px;
-    }
-}
-
-.gh-portal-unsubscribe .gh-portal-main-title {
-    margin-bottom: 16px;
-    font-size: 2.6rem;
-}
-
-.gh-portal-unsubscribe p {
-    margin-bottom: 16px;
-}
-
-.gh-portal-unsubscribe p:last-of-type {
-    margin-bottom: 0;
-}
+/* Unsubscribe page styles removed - functionality deprecated */
 
 .gh-portal-btn-inline {
     display: inline-block;
@@ -1242,9 +1187,7 @@ const MultipleProductsGlobalStyles = `
     }
 }
 
-.gh-portal-newsletter-selection {
-    animation: 0.5s ease-in-out fadeIn;
-}
+/* Newsletter selection animation removed - functionality deprecated */
 
 .gh-portal-signup {
     animation: 0.5s ease-in-out fadeIn;
@@ -1266,26 +1209,22 @@ export function getFrameStyles({site}) {
         GlobalStyles +
         FrameStyles +
         AccountHomePageStyles +
-        AccountPlanPageStyles +
+        // AccountPlanPageStyles removed - payment functionality deprecated
         InputFieldStyles +
-        ProductsSectionStyles({site}) +
+        // ProductsSectionStyles removed - payment functionality deprecated
         SwitchStyles +
         ActionButtonStyles +
         BackButtonStyles +
         AvatarStyles +
         MagicLinkStyles +
         SignupPageStyles +
-        OfferPageStyles({site}) +
+        // OfferPageStyles removed - payment functionality deprecated
         NotificationStyle +
         PopupNotificationStyles +
         MobileStyles +
         MultipleProductsGlobalStyles +
         FeedbackPageStyles +
-        EmailSuppressedPage +
-        EmailSuppressionFAQ +
-        EmailReceivingFAQ +
-        TipsAndDonationsSuccessStyle +
-        TipsAndDonationsErrorStyle +
+        // Email page styles removed - functionality deprecated
         RecommendationsPageStyles;
     return FrameStyle;
 }

@@ -1,13 +1,13 @@
 import {MATCH_RELATION_OPTIONS} from './relation-options';
 
-export const SUBSCRIBED_FILTER = ({newsletters, group}) => {
+export const SUBSCRIBED_FILTER = ({group, feature} = {}) => {
     return {
-        label: newsletters.length > 1 ? 'All newsletters' : 'Newsletter subscription',
+        label: 'Email subscription',
         name: 'subscribed',
         columnLabel: 'Subscribed',
         relationOptions: MATCH_RELATION_OPTIONS,
         valueType: 'options',
-        group: newsletters.length > 1 ? 'Newsletters' : group,
+        group: group,
         buildNqlFilter: (flt) => {
             const relation = flt.relation;
             const value = flt.value;
@@ -73,8 +73,8 @@ export const SUBSCRIBED_FILTER = ({newsletters, group}) => {
             };
         },
         options: [
-            {label: newsletters.length > 1 ? 'Subscribed to at least one' : 'Subscribed', name: 'subscribed'},
-            {label: newsletters.length > 1 ? 'Unsubscribed from all' : 'Unsubscribed', name: 'unsubscribed'},
+            {label: 'Subscribed', name: 'subscribed'},
+            {label: 'Unsubscribed', name: 'unsubscribed'},
             {label: 'Email disabled', name: 'email-disabled'}
         ],
         getColumnValue: (member) => {
@@ -84,7 +84,7 @@ export const SUBSCRIBED_FILTER = ({newsletters, group}) => {
                 };
             }
 
-            return member.newsletters.length > 0 ? {
+            return member.subscribed ? {
                 text: 'Subscribed'
             } : {
                 text: 'Unsubscribed'
@@ -93,76 +93,4 @@ export const SUBSCRIBED_FILTER = ({newsletters, group}) => {
     };
 };
 
-export const NEWSLETTERS_FILTERS = ({newsletters, group}) => {
-    if (newsletters.length <= 1) {
-        return [];
-    }
-    return newsletters.map((newsletter) => {
-        return {
-            label: newsletter.name,
-            name: `newsletters.slug:${newsletter.slug}`,
-            relationOptions: MATCH_RELATION_OPTIONS,
-            group,
-            valueType: 'options',
-            buildNqlFilter: (flt) => {
-                const relation = flt.relation;
-                const value = flt.value;
-
-                return (relation === 'is' && value === 'true') || (relation === 'is-not' && value === 'false')
-                    ? `(newsletters.slug:${newsletter.slug}+email_disabled:0)`
-                    : `(newsletters.slug:-${newsletter.slug},email_disabled:1)`;
-            },
-            parseNqlFilter: (flt) => {
-                const comparator = flt.$and || flt.$or;
-
-                if (!comparator || comparator.length !== 2) {
-                    return;
-                }
-
-                if (!comparator[0]['newsletters.slug'] || comparator[1].email_disabled === undefined) {
-                    return;
-                }
-
-                let value = comparator[0]['newsletters.slug'];
-                let invert = false;
-                if (typeof value === 'object') {
-                    if (!value.$ne) {
-                        // Unsupported relation type
-                        return;
-                    }
-                    invert = true;
-                    value = value.$ne;
-                }
-                if (value !== newsletter.slug) {
-                    // This filter is for a different newsletter
-                    return;
-                }
-                return {
-                    value: invert ? 'false' : 'true',
-                    relation: 'is'
-                };
-            },
-            options: [
-                {label: 'Subscribed', name: 'true'},
-                {label: 'Unsubscribed', name: 'false'}
-            ],
-            columnLabel: newsletter.name,
-            getColumnValue: (member, flt) => {
-                const relation = flt.relation;
-                const value = flt.value;
-
-                if (member.emailSuppression && member.emailSuppression.suppressed) {
-                    return {
-                        text: 'Email disabled'
-                    };
-                }
-
-                return {
-                    text: (relation === 'is' && value === 'true') || (relation === 'is-not' && value === 'false')
-                        ? 'Subscribed'
-                        : 'Unsubscribed'
-                };
-            }
-        };
-    });
-};
+// Newsletter feature removed - NEWSLETTERS_FILTERS no longer available

@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import moment from 'moment-timezone';
 import nql from '@tryghost/nql-lang';
-import {AUDIENCE_FEEDBACK_FILTER, CREATED_AT_FILTER, EMAIL_CLICKED_FILTER, EMAIL_COUNT_FILTER, EMAIL_FILTER, EMAIL_OPENED_COUNT_FILTER, EMAIL_OPENED_FILTER, EMAIL_OPEN_RATE_FILTER, EMAIL_SENT_FILTER, LABEL_FILTER, LAST_SEEN_FILTER, NAME_FILTER, NEWSLETTERS_FILTERS, NEXT_BILLING_DATE_FILTER, OFFERS_FILTER, PLAN_INTERVAL_FILTER, SIGNUP_ATTRIBUTION_FILTER, STATUS_FILTER, SUBSCRIBED_FILTER, SUBSCRIPTION_ATTRIBUTION_FILTER, SUBSCRIPTION_START_DATE_FILTER, SUBSCRIPTION_STATUS_FILTER, TIER_FILTER} from './filters';
+import {AUDIENCE_FEEDBACK_FILTER, CREATED_AT_FILTER, EMAIL_CLICKED_FILTER, EMAIL_COUNT_FILTER, EMAIL_FILTER, EMAIL_OPENED_COUNT_FILTER, EMAIL_OPENED_FILTER, EMAIL_OPEN_RATE_FILTER, EMAIL_SENT_FILTER, LABEL_FILTER, LAST_SEEN_FILTER, NAME_FILTER, NEXT_BILLING_DATE_FILTER, OFFERS_FILTER, PLAN_INTERVAL_FILTER, SIGNUP_ATTRIBUTION_FILTER, STATUS_FILTER, SUBSCRIBED_FILTER, SUBSCRIPTION_ATTRIBUTION_FILTER, SUBSCRIPTION_START_DATE_FILTER, SUBSCRIPTION_STATUS_FILTER, TIER_FILTER} from './filters';
 import {TrackedArray} from 'tracked-built-ins';
 import {action} from '@ember/object';
 import {didCancel, task} from 'ember-concurrency';
@@ -25,12 +25,7 @@ const FILTER_GROUPS = [
             SIGNUP_ATTRIBUTION_FILTER
         ]
     },
-    {
-        name: 'Newsletters',
-        filters: [
-            NEWSLETTERS_FILTERS
-        ]
-    },
+
     {
         name: 'Subscription',
         filters: [
@@ -162,15 +157,14 @@ export default class MembersFilter extends Component {
         })
     ]);
 
-    newsletters;
-    tiersList;
-    offers;
+    tiersList = [];
+    offers = [];
 
     @tracked isLoading = false;
 
     get filterProperties() {
         // Ensure we have all required data before proceeding
-        if (!this.newsletters || !this.tiersList || !this.offers) {
+        if (!this.tiersList || !this.offers) {
             return [];
         }
 
@@ -180,7 +174,6 @@ export default class MembersFilter extends Component {
         availableFilters = availableFilters.flatMap((filter) => {
             if (typeof filter === 'function') {
                 const filters = filter({
-                    newsletters: this.newsletters ?? [],
                     feature: this.feature
                 });
                 if (Array.isArray(filters)) {
@@ -250,16 +243,31 @@ export default class MembersFilter extends Component {
         try {
             this.isLoading = true;
 
-            await this.fetchTiers.perform();
-            await this.fetchNewsletters.perform();
-            await this.fetchOffers.perform();
+            try {
+                await this.fetchTiers.perform();
+            } catch (e) {
+                // If tiers fetching fails, set empty array and continue
+                console.warn('Failed to fetch tiers:', e);
+                this.tiersList = [];
+            }
+
+            try {
+                await this.fetchOffers.perform();
+            } catch (e) {
+                // If offers fetching fails, set empty array and continue
+                console.warn('Failed to fetch offers:', e);
+                this.offers = [];
+            }
         } catch (e) {
             // Do not throw cancellation errors
             if (didCancel(e)) {
                 return;
             }
 
-            throw e;
+            // For other errors, set empty arrays and continue
+            console.warn('Error in parseDefaultFilters:', e);
+            this.tiersList = this.tiersList || [];
+            this.offers = this.offers || [];
         } finally {
             this.isLoading = false;
         }
@@ -631,12 +639,7 @@ export default class MembersFilter extends Component {
         this.tiersList = response;
     }
 
-    @task({drop: true})
-    *fetchNewsletters() {
-        const response = yield this.store.query('newsletter', {filter: 'status:active'});
-        this.newsletters = response;
-        return response;
-    }
+
 
     @task({drop: true})
     *fetchOffers() {

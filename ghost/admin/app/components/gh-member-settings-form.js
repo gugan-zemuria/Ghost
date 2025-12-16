@@ -95,19 +95,13 @@ export default class extends Component {
 
     @action
     updateNewsletterPreference(event) {
-        if (!event.target.checked) {
-            this.member.set('newsletters', []);
-        } else if (this.newslettersList.firstObject) {
-            const newsletter = this.newslettersList.firstObject;
-            this.member.set('newsletters', [newsletter]);
-        }
+        // Newsletter feature removed - no action needed
     }
 
     @action
     setup() {
         try {
             this.fetchTiers.perform();
-            this.fetchNewsletters.perform();
         } catch (e) {
             // Do not throw cancellation errors
             if (didCancel(e)) {
@@ -135,7 +129,7 @@ export default class extends Component {
 
     @action
     setMemberNewsletters(newsletters) {
-        this.member.set('newsletters', newsletters);
+        // Newsletter feature removed - no action needed
     }
 
     @action
@@ -229,14 +223,5 @@ export default class extends Component {
         this.tiersList = yield this.store.query('tier', {filter: 'type:paid+active:true', include: 'monthly_price,yearly_price'});
     }
 
-    @task({drop: true})
-    *fetchNewsletters() {
-        this.newslettersList = yield this.store.query('newsletter', {filter: 'status:active'});
-        if (this.member.get('isNew')) {
-            const defaultNewsletters = this.newslettersList.filter((newsletter) => {
-                return newsletter.subscribeOnSignup && newsletter.visibility === 'members';
-            });
-            this.setMemberNewsletters(defaultNewsletters);
-        }
-    }
+
 }

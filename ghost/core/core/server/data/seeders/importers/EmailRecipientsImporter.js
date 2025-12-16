@@ -39,20 +39,8 @@ class EmailRecipientsImporter extends TableImporter {
     }
 
     async import(quantity) {
-        if (quantity === 0) {
-            return;
-        }
-
-        const now = Date.now();
-        const emails = await this.transaction
-            .select(
-                'id',
-                'newsletter_id',
-                'email_count',
-                'delivered_count',
-                'opened_count',
-                'failed_count')
-            .from('emails');
+        // Newsletters removed - skip email recipients generation since emails are also skipped
+        return;
         this.emails = new Map();
 
         for (const email of emails) {

@@ -23,7 +23,7 @@ export default Model.extend(ValidationEngine, {
     avatarImage: attr('string'),
 
     tiers: attr('member-tier'),
-    newsletters: hasMany('newsletter', {embedded: 'always', async: false}),
+    // Newsletter feature removed
     emailSuppression: attr(),
 
     labels: hasMany('label', {embedded: 'always', async: false}),

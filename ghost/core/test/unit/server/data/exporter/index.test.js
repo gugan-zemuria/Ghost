@@ -64,14 +64,9 @@ describe('Exporter', function () {
                     'tags',
                     'users',
                     'products',
-                    'stripe_products',
-                    'stripe_prices',
                     'posts_products',
-                    'newsletters',
                     'benefits',
                     'products_benefits',
-                    'offers',
-                    'offer_redemptions',
                     'snippets'
                 ];
 
@@ -116,14 +111,9 @@ describe('Exporter', function () {
                     'tags',
                     'users',
                     'products',
-                    'stripe_products',
-                    'stripe_prices',
                     'posts_products',
-                    'newsletters',
                     'benefits',
                     'products_benefits',
-                    'offers',
-                    'offer_redemptions',
                     'snippets'
                 ].concat(include);
 

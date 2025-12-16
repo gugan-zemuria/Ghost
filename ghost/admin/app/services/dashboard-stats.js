@@ -75,7 +75,7 @@ import mergeStatsByDate from 'ghost-admin/utils/merge-stats-by-date';
  * @type {Object}
  * @property {boolean} hasPaidTiers Whether the site has paid tiers
  * @property {boolean} hasMultipleTiers Whether the site has multiple paid tiers
- * @property {boolean} newslettersEnabled Whether the site has newsletters
+ * Newsletter feature removed
  * @property {boolean} membersEnabled Whether the site has members enabled
  */
 
@@ -141,8 +141,7 @@ export default class DashboardStatsService extends Service {
     /**
      * @type {?MemberCounts} Number of members that are subscribed (grouped by status)
      */
-    @tracked
-        newsletterSubscribers = null;
+    // Newsletter feature removed
 
     /**
      * @type {?number} Number of emails sent in last 30 days
@@ -365,7 +364,7 @@ export default class DashboardStatsService extends Service {
         this.siteStatus = {
             hasPaidTiers,
             hasMultipleTiers: hasPaidTiers && this.activePaidTiers.length > 1,
-            newslettersEnabled: this.settings.editorDefaultEmailRecipients !== 'disabled',
+            // Newsletter feature removed
             membersEnabled: this.membersUtils.isMembersEnabled
         };
     }
@@ -596,29 +595,7 @@ export default class DashboardStatsService extends Service {
         this.paidTiers = data.toArray();
     }
 
-    loadNewsletterSubscribers() {
-        if (this._loadNewsletterSubscribers.isRunning) {
-            // We need to explicitly wait for the already running task instead of dropping it and returning immediately
-            return this._loadNewsletterSubscribers.last;
-        }
-        return this._loadNewsletterSubscribers.perform();
-    }
-
-    @task
-    *_loadNewsletterSubscribers() {
-        this.newsletterSubscribers = null;
-
-        const [paid, free] = yield Promise.all([
-            this.membersCountCache.count('newsletters.status:active+status:-free+email_disabled:0'),
-            this.membersCountCache.count('newsletters.status:active+status:free+email_disabled:0')
-        ]);
-
-        this.newsletterSubscribers = {
-            total: paid + free,
-            free,
-            paid
-        };
-    }
+    // Newsletter feature removed
 
     loadEmailsSent() {
         if (this._loadEmailsSent.isRunning) {
@@ -694,7 +671,7 @@ export default class DashboardStatsService extends Service {
         await this._loadMemberCountStats.cancelAll();
         await this._loadSubscriptionCountStats.cancelAll();
         await this._loadLastSeen.cancelAll();
-        await this._loadNewsletterSubscribers.cancelAll();
+        // Newsletter feature removed
         await this._loadEmailsSent.cancelAll();
         await this._loadEmailOpenRateStats.cancelAll();
         await this._loadMemberAttributionStats.cancelAll();
@@ -709,7 +686,7 @@ export default class DashboardStatsService extends Service {
         this.loadPaidMembersByCadence();
         this.loadPaidMembersByTier();
 
-        this.loadNewsletterSubscribers();
+        // Newsletter feature removed
         this.loadEmailsSent();
         this.loadEmailOpenRateStats();
         this.loadMemberAttributionStats();

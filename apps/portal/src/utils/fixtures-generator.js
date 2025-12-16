@@ -39,7 +39,7 @@ export function getSiteData({
     portalButtonStyle: portal_button_style = 'icon-and-text',
     membersSupportAddress: members_support_address = 'support@example.com',
     editorDefaultEmailRecipients: editor_default_email_recipients = 'visibility',
-    newsletters = [],
+    // newsletters removed - functionality deprecated
     posts = getPostsData(),
     commentsEnabled,
     recommendations = [],
@@ -67,7 +67,7 @@ export function getSiteData({
         portal_button_style,
         members_support_address,
         comments_enabled: commentsEnabled !== 'off',
-        newsletters,
+        newsletters: [], // Newsletter functionality removed
         recommendations,
         recommendations_enabled: !!recommendationsEnabled,
         editor_default_email_recipients,
@@ -124,7 +124,7 @@ export function getMemberData({
         suppressed: false,
         info: null
     },
-    newsletters = []
+    // newsletters removed - functionality deprecated
 } = {}) {
     return {
         uuid: `member_${objectId()}`,
@@ -136,44 +136,11 @@ export function getMemberData({
         avatar_image,
         subscriptions,
         email_suppression,
-        newsletters
+        newsletters: [] // Newsletter functionality removed
     };
 }
 
-export function getNewsletterData({
-    id = `${objectId()}`,
-    uuid = `${objectId()}`,
-    name = 'Newsletter',
-    description = 'Newsletter description',
-    slug = 'newsletter',
-    sender_email = null,
-    subscribe_on_signup = true,
-    visibility = 'members',
-    sort_order = 0
-}) {
-    return {
-        id,
-        uuid,
-        name,
-        description,
-        slug,
-        sender_email,
-        subscribe_on_signup,
-        visibility,
-        sort_order
-    };
-}
-
-export function getNewslettersData({numOfNewsletters = 3} = {}) {
-    const newsletters = [];
-    for (let i = 0; i < numOfNewsletters; i++) {
-        newsletters.push(getNewsletterData({
-            name: `Newsletter ${i + 1}`,
-            description: `Newsletter ${i + 1} description`
-        }));
-    }
-    return newsletters.slice(0, numOfNewsletters);
-}
+// Newsletter generator functions removed - functionality deprecated
 
 export function getPostsData({numOfPosts = 3} = {}) {
     const posts = [];
@@ -296,7 +263,7 @@ export function getBenefits({numOfBenefits}) {
     const benefits = [
         getBenefitData({name: `Limited early adopter pricing #${uniqueId.substring(0, 6)}`}),
         getBenefitData({name: `Latest gear reviews #${uniqueId.substring(6, 12)}`}),
-        getBenefitData({name: `Weekly email newsletter #${uniqueId.substring(12, 18)}`}),
+        getBenefitData({name: `Exclusive content access #${uniqueId.substring(12, 18)}`}),
         getBenefitData({name: `Listen to my podcast #${uniqueId.substring(18)}`})
     ];
     return benefits.slice(0, numOfBenefits);

@@ -1,7 +1,13 @@
 const should = require('should');
 
-const Tier = require('../../../../../../core/server/services/tiers/Tier');
 const ObjectID = require('bson-objectid').default;
+
+// Simple Tier mock for testing (tiers service removed)
+class Tier {
+    constructor(data) {
+        this.id = data.id;
+    }
+}
 const assert = require('assert/strict');
 const fs = require('fs-extra');
 const path = require('path');

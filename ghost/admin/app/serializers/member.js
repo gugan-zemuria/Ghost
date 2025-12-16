@@ -6,8 +6,8 @@ export default class MemberSerializer extends ApplicationSerializer.extend(Embed
     attrs = {
         createdAtUTC: {key: 'created_at'},
         lastSeenAtUTC: {key: 'last_seen_at'},
-        labels: {embedded: 'always'},
-        newsletters: {embedded: 'always'}
+        labels: {embedded: 'always'}
+        // Newsletter feature removed
     };
 
     serialize(/*snapshot, options*/) {

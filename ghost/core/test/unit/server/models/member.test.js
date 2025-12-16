@@ -86,4 +86,64 @@ describe('Unit: models/member', function () {
             updatePivot.calledWith({expiry_at: null}, {query: {where: {product_id: '1'}}}).should.be.true();
         });
     });
+
+    /**
+     * **Feature: remove-payment-feature, Property 2: Member Data Integrity After Removal**
+     * **Validates: Requirements 7.1, 7.2, 7.3**
+     * 
+     * For any member record, the member's core data (id, email, name, status) should remain
+     * intact and queryable after the payment removal process, and member queries should
+     * execute without referencing payment join tables.
+     */
+    describe('Property: Member Data Integrity After Payment Removal', function () {
+        it('member model should not have stripeCustomers relationship', function () {
+            const memberModel = new models.Member({email: 'test@example.com'});
+            should.not.exist(memberModel.stripeCustomers);
+        });
+
+        it('member model should not have stripeSubscriptions relationship', function () {
+            const memberModel = new models.Member({email: 'test@example.com'});
+            should.not.exist(memberModel.stripeSubscriptions);
+        });
+
+        it('member relationships should not include payment-related tables', function () {
+            const Member = models.Member;
+            const relationships = Member.prototype.relationships || [];
+            
+            relationships.should.not.containEql('stripeCustomers');
+            relationships.should.not.containEql('stripeSubscriptions');
+            relationships.should.not.containEql('subscriptions');
+        });
+
+        it('member filterRelations should not include payment tables', function () {
+            const memberModel = new models.Member({email: 'test@example.com'});
+            const filterRelations = memberModel.filterRelations();
+            
+            should.not.exist(filterRelations.stripeCustomers);
+            should.not.exist(filterRelations.subscriptions);
+            should.not.exist(filterRelations.stripe_customers);
+        });
+
+        it('core fields are preserved in member model without payment relationships', function () {
+            const testCases = [
+                {email: 'test1@example.com', name: 'Test User 1', status: 'free'},
+                {email: 'test2@example.com', name: 'Test User 2', status: 'paid'},
+                {email: 'test3@example.com', name: 'Test User 3', status: 'comped'},
+                {email: 'user@domain.org', name: 'Another User', status: 'free'}
+            ];
+
+            testCases.forEach((memberData) => {
+                const memberModel = new models.Member(memberData);
+                
+                // Core fields should be preserved
+                memberModel.get('email').should.equal(memberData.email);
+                memberModel.get('name').should.equal(memberData.name);
+                memberModel.get('status').should.equal(memberData.status);
+                
+                // Payment relationships should not exist
+                should.not.exist(memberModel.stripeCustomers);
+                should.not.exist(memberModel.stripeSubscriptions);
+            });
+        });
+    });
 });
