@@ -246,7 +246,23 @@ export class ActivityPubAPI {
         }
     }
 
+    private async checkActivityPubEnabled(): Promise<boolean> {
+        try {
+            const response = await fetch('/ghost/api/admin/site');
+            const json = await response.json();
+            return json?.site?.social_web_enabled === true;
+        } catch (err) {
+            return false;
+        }
+    }
+
     private async fetchJSON(url: URL, method: 'DELETE' | 'GET' | 'POST' | 'PUT' = 'GET', body?: object): Promise<object | null> {
+        // Check if ActivityPub is enabled before making requests
+        const isEnabled = await this.checkActivityPubEnabled();
+        if (!isEnabled) {
+            throw new Error('ActivityPub is not enabled');
+        }
+
         const token = await this.getToken();
         const options: RequestInit = {
             method,

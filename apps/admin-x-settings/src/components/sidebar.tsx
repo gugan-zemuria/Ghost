@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import useFeatureFlag from '../hooks/use-feature-flag';
 import {Button, Icon, SettingNavItem, type SettingNavItemProps, SettingNavSection, TextField, useFocusContext} from '@tryghost/admin-x-design-system';
 
-import {checkStripeEnabled, getSettingValues} from '@tryghost/admin-x-framework/api/settings';
+
 
 import {searchKeywords as advancedSearchKeywords} from './settings/advanced/advanced-settings';
 import {searchKeywords as emailSearchKeywords} from './settings/email/email-settings';
@@ -13,7 +13,7 @@ import {searchKeywords as growthSearchKeywords} from './settings/growth/growth-s
 import {searchKeywords as membershipSearchKeywords} from './settings/membership/membership-settings';
 import {searchKeywords as siteSearchKeywords} from './settings/site/site-settings';
 
-import {useGlobalData} from './providers/global-data-provider';
+
 import {useRouting} from '@tryghost/admin-x-framework/routing';
 import {useScrollSectionContext, useScrollSectionNav} from '../hooks/use-scroll-section';
 import {useSearch} from './providers/settings-app-provider';
@@ -106,9 +106,7 @@ const Sidebar: React.FC = () => {
         };
     }, [filter]);
 
-    const {settings, config} = useGlobalData();
-    const [hasTipsAndDonations] = getSettingValues(settings, ['donations_enabled']) as [string];
-    const hasStripeEnabled = checkStripeEnabled(settings || [], config || {});
+
     const hasWelcomeEmails = useFeatureFlag('welcomeEmails');
 
     const handleSectionClick = (e?: React.MouseEvent<HTMLAnchorElement>) => {
@@ -186,13 +184,8 @@ const Sidebar: React.FC = () => {
                 </SettingNavSection>
 
                 {/* Membership settings */}
-                <SettingNavSection isVisible={checkVisible([...Object.values(membershipSearchKeywords).flat(), ...emailSearchKeywords.newslettersNavMenu])} title="Membership">
-                    <NavItem icon='key' keywords={membershipSearchKeywords.access} navid={['members', 'spam-filters']} title="Access" onClick={handleSectionClick} />
-                    <NavItem icon='bills' keywords={membershipSearchKeywords.tiers} navid='tiers' title="Tiers" onClick={handleSectionClick} />
-                    <NavItem icon='portal' keywords={membershipSearchKeywords.portal} navid='portal' title="Signup portal" onClick={handleSectionClick} />
+                <SettingNavSection isVisible={checkVisible(Object.values(membershipSearchKeywords).flat())} title="Membership">
                     {hasWelcomeEmails && <NavItem icon='mailplus' keywords={membershipSearchKeywords.memberEmails} navid='memberemails' title="Welcome emails" onClick={handleSectionClick} />}
-                    {hasTipsAndDonations && hasStripeEnabled && <NavItem icon='piggybank' keywords={membershipSearchKeywords.tips} navid='tips-and-donations' title="Tips & donations" onClick={handleSectionClick} />}
-                    <NavItem icon='email' keywords={emailSearchKeywords.newslettersNavMenu} navid={['enable-newsletters', 'default-recipients', 'newsletters', 'mailgun']} title="Newsletters" onClick={handleSectionClick} />
                 </SettingNavSection>
 
                 {/* Growth */}
@@ -201,7 +194,6 @@ const Sidebar: React.FC = () => {
                     <NavItem icon='globe-simple' keywords={growthSearchKeywords.explore} navid='explore' title="Ghost Explore" onClick={handleSectionClick} />
                     <NavItem icon='heart' keywords={growthSearchKeywords.recommendations} navid='recommendations' title="Recommendations" onClick={handleSectionClick} />
                     <NavItem icon='emailfield' keywords={growthSearchKeywords.embedSignupForm} navid='embed-signup-form' title="Signup forms" onClick={handleSectionClick} />
-                    {hasStripeEnabled && <NavItem icon='discount' keywords={growthSearchKeywords.offers} navid='offers' title="Offers" onClick={handleSectionClick} />}
                 </SettingNavSection>
 
                 <SettingNavSection isVisible={checkVisible(Object.values(advancedSearchKeywords).flat())} title="Advanced">
@@ -210,6 +202,11 @@ const Sidebar: React.FC = () => {
                     <NavItem icon='brackets' keywords={advancedSearchKeywords.codeInjection} navid='code-injection' title="Code injection" onClick={handleSectionClick} />
                     <NavItem icon='labs-flask' keywords={advancedSearchKeywords.labs} navid='labs' title="Labs" onClick={handleSectionClick} />
                     <NavItem icon='time-back' keywords={advancedSearchKeywords.history} navid='history' title="History" onClick={handleSectionClick} />
+                </SettingNavSection>
+
+                {/* Email settings */}
+                <SettingNavSection isVisible={checkVisible(Object.values(emailSearchKeywords).flat())} title="Email">
+                    <NavItem icon='email' keywords={emailSearchKeywords.emailNavMenu} navid='email' title="Email settings" onClick={handleSectionClick} />
                 </SettingNavSection>
 
                 {!filter &&

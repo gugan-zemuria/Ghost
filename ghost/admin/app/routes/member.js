@@ -26,7 +26,7 @@ export default class MembersRoute extends MembersManagementRoute {
         this._requiresBackgroundRefresh = false;
 
         if (params.member_id) {
-            return this.store.queryRecord('member', {id: params.member_id, include: 'tiers'});
+            return this.store.queryRecord('member', {id: params.member_id});
         } else {
             return this.store.createRecord('member');
         }

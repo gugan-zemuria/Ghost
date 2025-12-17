@@ -170,7 +170,8 @@ export default class DashboardStatsService extends Service {
     paidTiers = null;
 
     get activePaidTiers() {
-        return this.paidTiers ? this.paidTiers.filter(tier => tier.active) : null;
+        // Tiers functionality has been removed - return empty array
+        return [];
     }
 
     /**

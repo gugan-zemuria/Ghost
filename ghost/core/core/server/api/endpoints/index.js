@@ -109,9 +109,7 @@ module.exports = {
         return apiFramework.pipeline(require('./tags'), localUtils);
     },
 
-    get tiers() {
-        return apiFramework.pipeline(require('./tiers'), localUtils);
-    },
+
 
     get users() {
         return apiFramework.pipeline(require('./users'), localUtils);

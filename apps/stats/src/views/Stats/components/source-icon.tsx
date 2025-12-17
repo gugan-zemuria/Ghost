@@ -7,10 +7,10 @@ interface SourceIconProps {
     defaultSourceIconUrl: string;
 }
 
-const SourceIcon: React.FC<SourceIconProps> = ({defaultSourceIconUrl, displayName, iconSrc}) => {
+const SourceIcon: React.FC<SourceIconProps> = ({defaultSourceIconUrl, displayName: _displayName, iconSrc}) => {
     return (
         <>
-            {displayName.trim().toLowerCase().endsWith('newsletter') ? (
+            {false ? (
                 <LucideIcon.Mail aria-label="Newsletter" className="size-4 text-muted-foreground" />
             ) : (
                 <img

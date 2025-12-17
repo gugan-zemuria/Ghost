@@ -220,7 +220,8 @@ export default class extends Component {
 
     @task({drop: true})
     *fetchTiers() {
-        this.tiersList = yield this.store.query('tier', {filter: 'type:paid+active:true', include: 'monthly_price,yearly_price'});
+        // Tiers functionality has been removed - set empty array
+        this.tiersList = [];
     }
 
 

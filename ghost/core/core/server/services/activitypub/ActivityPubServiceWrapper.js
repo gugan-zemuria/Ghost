@@ -33,16 +33,23 @@ module.exports = class ActivityPubServiceWrapper {
         );
 
         async function configureActivityPub() {
-            if (settingsCache.get('social_web_enabled')) {
-                if (!ActivityPubServiceWrapper.initialised) {
-                    await ActivityPubServiceWrapper.instance.enable();
-                    ActivityPubServiceWrapper.initialised = true;
+            try {
+                if (settingsCache.get('social_web_enabled')) {
+                    if (!ActivityPubServiceWrapper.initialised) {
+                        await ActivityPubServiceWrapper.instance.enable();
+                        ActivityPubServiceWrapper.initialised = true;
+                    }
+                } else {
+                    if (ActivityPubServiceWrapper.initialised) {
+                        await ActivityPubServiceWrapper.instance.disable();
+                        ActivityPubServiceWrapper.initialised = false;
+                    }
                 }
-            } else {
-                if (ActivityPubServiceWrapper.initialised) {
-                    await ActivityPubServiceWrapper.instance.disable();
-                    ActivityPubServiceWrapper.initialised = false;
-                }
+            } catch (error) {
+                // Log the error but don't crash the application
+                logging.warn('ActivityPub configuration failed:', error.message);
+                // Ensure we mark as not initialised if there was an error
+                ActivityPubServiceWrapper.initialised = false;
             }
         }
 

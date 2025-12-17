@@ -25,10 +25,12 @@
 .gh-flow-content .gh-site-icon,
 .gh-signin .gh-site-icon {
     margin-bottom: 20px;
-    width: 70px;
-    height: 70px;
+    width: 140px;
+    height: 50px;
     background-color: transparent;
-    background-size: 70px;
+    background-size: 140px;
+    background-repeat: no-repeat;
+    background-position: center;
     border-radius: 3px;
 }
 

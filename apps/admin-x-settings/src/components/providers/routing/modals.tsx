@@ -4,7 +4,7 @@ import type {RoutingModalProps} from '@tryghost/admin-x-framework/routing';
 
 import AboutModal from '../../settings/general/about';
 import AddIntegrationModal from '../../settings/advanced/integrations/add-integration-modal';
-import AddNewsletterModal from '../../settings/email/newsletters/add-newsletter-modal';
+
 // import AddOfferModal from '../../settings/growth/offers/AddOfferModal';
 import AddRecommendationModal from '../../settings/growth/recommendations/add-recommendation-modal';
 import AnnouncementBarModal from '../../settings/site/announcement-bar-modal';
@@ -17,23 +17,18 @@ import FirstPromoterModal from '../../settings/advanced/integrations/first-promo
 import HistoryModal from '../../settings/advanced/history-modal';
 import InviteUserModal from '../../settings/general/invite-user-modal';
 import NavigationModal from '../../settings/site/navigation-modal';
-import NewsletterDetailModal from '../../settings/email/newsletters/newsletter-detail-modal';
-import OfferSuccess from '../../settings/growth/offers/offer-success';
-// import OffersModal from '../../settings/growth/offers/OffersIndex';
-import OffersContainerModal from '../../settings/growth/offers/offers-container-modal';
+
+
 import PinturaModal from '../../settings/advanced/integrations/pintura-modal';
-import PortalModal from '../../settings/membership/portal/portal-modal';
+
 import SlackModal from '../../settings/advanced/integrations/slack-modal';
-import StripeConnectModal from '../../settings/membership/stripe/stripe-connect-modal';
 import TestimonialsModal from '../../settings/growth/explore/testimonials-modal';
-import TierDetailModal from '../../settings/membership/tiers/tier-detail-modal';
 import UnsplashModal from '../../settings/advanced/integrations/unsplash-modal';
 import UserDetailModal from '../../settings/general/user-detail-modal';
 import ZapierModal from '../../settings/advanced/integrations/zapier-modal';
 
 const modals = {
     AddIntegrationModal,
-    AddNewsletterModal,
     AddRecommendationModal,
     CustomIntegrationModal,
     DesignAndThemeModal,
@@ -42,24 +37,15 @@ const modals = {
     HistoryModal,
     InviteUserModal,
     NavigationModal,
-    NewsletterDetailModal,
     PinturaModal,
-    PortalModal,
     SlackModal,
-    StripeConnectModal,
     TestimonialsModal,
-    TierDetailModal,
     UnsplashModal,
     UserDetailModal,
     ZapierModal,
     AnnouncementBarModal,
     EmbedSignupFormModal,
-    OffersContainerModal,
-    // OffersModal,
-    // AddOfferModal,
-    // EditOfferModal,
-    AboutModal,
-    OfferSuccess
+    AboutModal
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } satisfies {[key: string]: ModalComponent<any>};
 

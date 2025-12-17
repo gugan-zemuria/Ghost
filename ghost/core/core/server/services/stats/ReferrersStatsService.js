@@ -143,12 +143,8 @@ class ReferrersStatsService {
             .where('attribution_type', 'post')
             .groupBy('referrer_source');
 
-        const conversionRows = await knex('members_subscription_created_events')
-            .select('referrer_source')
-            .select(knex.raw('COUNT(id) AS total'))
-            .where('attribution_id', postId)
-            .where('attribution_type', 'post')
-            .groupBy('referrer_source');
+        // Payment features removed - no conversion events
+        const conversionRows = [];
 
         // Stitch them toghether, grouping them by source
 
@@ -254,24 +250,8 @@ class ReferrersStatsService {
         const knex = this.knex;
         const {dateFrom: startDateTime, dateTo: endDateTime} = getDateBoundaries(options);
 
-        // Join subscription created events with paid subscription events to get MRR changes
-        let query = knex('members_subscription_created_events as msce')
-            .join('members_paid_subscription_events as mpse', function () {
-                this.on('msce.member_id', '=', 'mpse.member_id')
-                    .andOn('msce.subscription_id', '=', 'mpse.subscription_id');
-            })
-            .select(knex.raw(`DATE(msce.created_at) as date`))
-            .select(knex.raw(`SUM(mpse.mrr_delta) as mrr`))
-            .select(knex.raw(`msce.referrer_source as source`))
-            .where('mpse.mrr_delta', '>', 0) // Only positive MRR changes (new subscriptions)
-            .whereNotNull('msce.referrer_source') // Only entries with attribution
-            .groupBy('date', 'msce.referrer_source')
-            .orderBy('date');
-
-        // Apply centralized date filtering
-        applyDateFilter(query, startDateTime, endDateTime, 'msce.created_at');
-
-        const rows = await query;
+        // Payment features removed - return empty results
+        const rows = [];
 
         return rows;
     }
@@ -287,35 +267,21 @@ class ReferrersStatsService {
         const {dateFrom: startDateTime, dateTo: endDateTime} = getDateBoundaries(options);
 
         // Query 1: Free members who haven't converted to paid within the same time window
+        // Payment features removed - all members are considered free signups
         const freeSignupsQuery = knex('members_created_events as mce')
             .select('mce.referrer_source as source')
             .select(knex.raw('COUNT(DISTINCT mce.member_id) as signups'))
-            .leftJoin('members_subscription_created_events as msce', function () {
-                this.on('mce.member_id', '=', 'msce.member_id')
-                    // Only join if the conversion happened within the same time window
-                    .andOn('msce.created_at', '>=', knex.raw('?', [startDateTime]))
-                    .andOn('msce.created_at', '<=', knex.raw('?', [endDateTime]));
-            })
-            .whereNull('msce.id')
+            .whereNotNull('mce.referrer_source')
             .groupBy('mce.referrer_source');
 
         // Apply date filtering to the main query
         applyDateFilter(freeSignupsQuery, startDateTime, endDateTime, 'mce.created_at');
 
-        // Query 2: Paid conversions
-        const paidConversionsQuery = knex('members_subscription_created_events as msce')
-            .select('msce.referrer_source as source')
-            .select(knex.raw('COUNT(DISTINCT msce.member_id) as paid_conversions'))
-            .groupBy('msce.referrer_source');
+        // Payment features removed - no paid conversions
+        const paidResults = [];
 
-        // Apply date filtering to the paid conversions query
-        applyDateFilter(paidConversionsQuery, startDateTime, endDateTime, 'msce.created_at');
-
-        // Execute both queries in parallel
-        const [freeResults, paidResults] = await Promise.all([
-            freeSignupsQuery,
-            paidConversionsQuery
-        ]);
+        // Execute free signups query only
+        const freeResults = await freeSignupsQuery;
 
         // Combine results by source
         const sourceMap = new Map();
@@ -472,14 +438,6 @@ class ReferrersStatsService {
         const freeSignupsQuery = knex('members_created_events as mce')
             .select(knex.raw(`mce.${utmField} as utm_value`))
             .select(knex.raw('COUNT(DISTINCT mce.member_id) as signups'))
-            .leftJoin('members_subscription_created_events as msce', function () {
-                this.on('mce.member_id', '=', 'msce.member_id')
-                    // Filter msce.created_at: only count conversions within the same time window
-                    // This ensures we don't count conversions that happened outside our date range
-                    .andOn('msce.created_at', '>=', knex.raw('?', [startDateTime]))
-                    .andOn('msce.created_at', '<=', knex.raw('?', [endDateTime]));
-            })
-            .whereNull('msce.id')
             .whereNotNull(`mce.${utmField}`)
             .groupBy(`mce.${utmField}`);
 
@@ -519,27 +477,8 @@ class ReferrersStatsService {
         const {dateFrom: startDateTime, dateTo: endDateTime} = getDateBoundaries(options);
         const {post_id: postId} = options;
 
-        const paidConversionsQuery = knex('members_subscription_created_events as msce')
-            .select(knex.raw(`msce.${utmField} as utm_value`))
-            .select(knex.raw('COUNT(DISTINCT msce.member_id) as paid_conversions'))
-            .whereNotNull(`msce.${utmField}`)
-            .groupBy(`msce.${utmField}`);
-
-        // Apply date filtering
-        applyDateFilter(paidConversionsQuery, startDateTime, endDateTime, 'msce.created_at');
-
-        // Apply post filtering if post_id is provided
-        if (postId) {
-            paidConversionsQuery
-                .where('msce.attribution_id', postId)
-                .where('msce.attribution_type', 'post');
-        }
-
-        const results = await paidConversionsQuery;
-        return results.map(row => ({
-            utm_value: row.utm_value,
-            paid_conversions: parseInt(row.paid_conversions) || 0
-        }));
+        // Payment features removed - return empty results
+        return [];
     }
 
     /**
@@ -561,33 +500,8 @@ class ReferrersStatsService {
         const {dateFrom: startDateTime, dateTo: endDateTime} = getDateBoundaries(options);
         const {post_id: postId} = options;
 
-        // Join subscription created events with paid subscription events to get MRR changes
-        let query = knex('members_subscription_created_events as msce')
-            .join('members_paid_subscription_events as mpse', function () {
-                this.on('msce.member_id', '=', 'mpse.member_id')
-                    .andOn('msce.subscription_id', '=', 'mpse.subscription_id');
-            })
-            .select(knex.raw(`msce.${utmField} as utm_value`))
-            .select(knex.raw(`SUM(mpse.mrr_delta) as mrr`))
-            .where('mpse.mrr_delta', '>', 0) // Only positive MRR changes (new subscriptions)
-            .whereNotNull(`msce.${utmField}`)
-            .groupBy(`msce.${utmField}`);
-
-        // Apply date filtering
-        applyDateFilter(query, startDateTime, endDateTime, 'msce.created_at');
-
-        // Apply post filtering if post_id is provided
-        if (postId) {
-            query
-                .where('msce.attribution_id', postId)
-                .where('msce.attribution_type', 'post');
-        }
-
-        const results = await query;
-        return results.map(row => ({
-            utm_value: row.utm_value,
-            mrr: parseInt(row.mrr) || 0
-        }));
+        // Payment features removed - return empty results
+        return [];
     }
 
     /**

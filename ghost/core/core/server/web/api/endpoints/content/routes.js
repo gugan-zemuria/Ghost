@@ -36,10 +36,7 @@ module.exports = function apiRoutes() {
     // ## Settings
     router.get('/settings', mw.authenticatePublic, http(api.publicSettings.browse));
 
-    // ## Tiers (minimal implementation - payment functionality disabled)
-    router.get('/tiers', mw.authenticatePublic, http(api.tiers.browse));
-    router.get('/tiers/:id', mw.authenticatePublic, http(api.tiers.read));
-    router.get('/tiers/slug/:slug', mw.authenticatePublic, http(api.tiers.read));
+
 
     // ## Members - payment-related endpoints removed
 

@@ -74,8 +74,8 @@ const products = [
 export const site = getSiteData({
     title: 'The Blueprint',
     description: 'Thoughts, stories and ideas.',
-    logo: 'https://static.ghost.org/v4.0.0/images/ghost-orb-1.png',
-    icon: 'https://static.ghost.org/v4.0.0/images/ghost-orb-1.png',
+    logo: '/assets/img/inksigma-logo.svg',
+    icon: '/assets/img/inksigma-logo.svg',
     accentColor: '#45C32E',
     url: 'https://portal.localhost',
     plans: {

@@ -1,7 +1,8 @@
 import {type Config} from '@tryghost/admin-x-framework/api/config';
 import {type Setting, checkStripeEnabled, getSettingValue} from '@tryghost/admin-x-framework/api/settings';
 import {type SiteData} from '@tryghost/admin-x-framework/api/site';
-import {type Tier} from '@tryghost/admin-x-framework/api/tiers';
+// Tiers removed - payment functionality disabled
+type Tier = any;
 
 export type portalPreviewUrlTypes = {
     settings: Setting[];

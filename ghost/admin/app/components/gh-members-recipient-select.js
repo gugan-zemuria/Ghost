@@ -160,9 +160,8 @@ export default class GhMembersRecipientSelect extends Component {
 
             options.push(labelsGroup);
         }
-        // fetch all tiers w̶i̶t̶h̶ c̶o̶u̶n̶t̶s̶
-        // TODO: add `include: 'count.members` to query once API supports
-        const tiers = yield this.store.query('tier', {filter: 'type:paid', limit: 'all'});
+        // Tiers functionality has been removed - set empty array
+        const tiers = [];
 
         if (tiers.length > 1) {
             const activeTiersGroup = {

@@ -20,8 +20,7 @@ interface GlobalData {
     setAudience: (value: number) => void;
     setRange: (value: number) => void;
     settings: Setting[];
-    selectedNewsletterId: string | null;
-    setSelectedNewsletterId: (id: string | null) => void;
+
 }
 
 const GlobalDataContext = createContext<GlobalData | undefined>(undefined);
@@ -45,7 +44,7 @@ const GlobalDataProvider = ({children}: { children: ReactNode }) => {
     const [range, setRange] = useState(STATS_RANGE_OPTIONS[STATS_DEFAULT_RANGE_KEY].value);
     // Initialize with all audiences selected (binary 111 = 7)
     const [audience, setAudience] = useState(7);
-    const [selectedNewsletterId, setSelectedNewsletterId] = useState<string | null>(null);
+
 
     // Check for errors in the main requests
     const ghostRequests = [config, settings, site];
@@ -79,9 +78,7 @@ const GlobalDataProvider = ({children}: { children: ReactNode }) => {
         setRange,
         audience,
         setAudience,
-        settings: settings.data?.settings || [],
-        selectedNewsletterId,
-        setSelectedNewsletterId
+        settings: settings.data?.settings || []
     }}>
         {children}
     </GlobalDataContext.Provider>;

@@ -105,10 +105,7 @@ module.exports = function apiRoutes() {
     router.put('/tags/:id', mw.authAdminApi, http(api.tags.edit));
     router.delete('/tags/:id', mw.authAdminApi, http(api.tags.destroy));
 
-    // ## Tiers (minimal implementation - payment functionality disabled)
-    router.get('/tiers', mw.authAdminApi, http(api.tiers.browse));
-    router.get('/tiers/:id', mw.authAdminApi, http(api.tiers.read));
-    router.get('/tiers/slug/:slug', mw.authAdminApi, http(api.tiers.read));
+
 
     // ## Members
     router.get('/members', mw.authAdminApi, http(api.members.browse));

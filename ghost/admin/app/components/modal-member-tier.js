@@ -47,12 +47,9 @@ export default class ModalMemberTier extends ModalComponent {
 
     @task({drop: true})
     *fetchTiers() {
-        this.tiers = yield this.store.query('tier', {filter: 'type:paid+active:true', include: 'monthly_price,yearly_price,benefits'});
-
+        // Tiers functionality has been removed - set empty array
+        this.tiers = [];
         this.loadingTiers = false;
-        if (this.tiers.length > 0) {
-            this.selectedTier = this.tiers.firstObject.id;
-        }
     }
 
     get activeSubscriptions() {

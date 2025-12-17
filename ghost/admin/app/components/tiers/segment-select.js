@@ -69,9 +69,8 @@ export default class TiersSegmentSelect extends Component {
     *fetchOptionsTask() {
         const options = yield [];
 
-        // fetch all tiers with count
-        // TODO: add `include: 'count.members` to query once API supports
-        const tiers = yield this.store.query('tier', {filter: 'type:paid', limit: 'all', include: 'monthly_price,yearly_price,benefits'});
+        // Tiers functionality has been removed - set empty array
+        const tiers = [];
         this.tiers = tiers;
 
         if (tiers.length > 0) {

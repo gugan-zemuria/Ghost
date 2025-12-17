@@ -133,7 +133,7 @@ export default class Main extends Component {
             return;
         }
 
-        let iconUrl = 'https://static.ghost.org/v4.0.0/images/ghost-orb-1.png';
+        let iconUrl = '/assets/img/inksigma-logo.svg';
 
         this.set('iconStyle', htmlSafe(`background-image: url(${iconUrl})`));
         this.set('iconClass', 'gh-nav-logo-default');

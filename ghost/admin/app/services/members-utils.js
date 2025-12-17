@@ -36,21 +36,13 @@ export default class MembersUtilsService extends Service {
             return;
         }
 
-        // contributors don't have permissions to fetch tiers
-        if (this.session.user && !this.session.user.isContributor) {
-            return this.store.query('tier', {filter: 'type:paid+active:true', limit: 'all'}).then((tiers) => {
-                this.paidTiers = tiers;
-            });
-        }
+        // Tiers functionality has been removed - set empty array
+        this.paidTiers = [];
     }
 
     async reload() {
-        // contributors don't have permissions to fetch tiers
-        if (this.session.user && !this.session.user.isContributor) {
-            return this.store.query('tier', {filter: 'type:paid+active:true', limit: 'all'}).then((tiers) => {
-                this.paidTiers = tiers;
-            });
-        }
+        // Tiers functionality has been removed - set empty array
+        this.paidTiers = [];
     }
 
     /**

@@ -143,18 +143,13 @@ class PostsStatsService {
                         .select(knex.raw('MIN(attribution_type) as attribution_type'))
                         .select(knex.raw('MIN(attribution_id) as attribution_id'))
                         .from(function () {
+                            // Payment features removed - only use members_created_events
                             const subquery1 = this.select('attribution_url', 'attribution_type', 'attribution_id')
                                 .from('members_created_events')
                                 .whereNotNull('attribution_url');
                             applyDateFilter(subquery1, dateFrom, dateTo, 'created_at');
                             
-                            subquery1.union(function () {
-                                const subquery2 = this.select('attribution_url', 'attribution_type', 'attribution_id')
-                                    .from('members_subscription_created_events')
-                                    .whereNotNull('attribution_url');
-                                applyDateFilter(subquery2, dateFrom, dateTo, 'created_at');
-                            })
-                                .as('combined');
+                            subquery1.as('combined');
                         })
                         .groupBy('attribution_url');
                 })
@@ -309,6 +304,7 @@ class PostsStatsService {
 
             // First, let's get all sources from both tables using separate queries
             // Then combine and group them in a cross-database compatible way
+            // Payment features removed - only get sources from member creation events
             const membersCreatedSources = this.knex('members_created_events as mce')
                 .select('mce.referrer_source as source')
                 .select('mce.referrer_url')
@@ -316,20 +312,8 @@ class PostsStatsService {
                 .where('mce.attribution_type', 'post')
                 .whereNotNull('mce.referrer_source');
 
-            const membersSubscriptionSources = this.knex('members_subscription_created_events as msce')
-                .select('msce.referrer_source as source')
-                .select('msce.referrer_url')
-                .where('msce.attribution_id', postId)
-                .where('msce.attribution_type', 'post')
-                .whereNotNull('msce.referrer_source');
-
-            // Using a simpler combined query that works in SQLite
-            const allSources = this.knex.select('source', 'referrer_url')
-                .from(membersCreatedSources.as('sources1'))
-                .union(function () {
-                    this.select('source', 'referrer_url')
-                        .from(membersSubscriptionSources.as('sources2'));
-                });
+            // Payment features removed - use only member creation sources
+            const allSources = membersCreatedSources;
 
             // Create the final CTE that we'll use to get all referrers
             const allReferrersCTE = this.knex.select('source')
@@ -427,7 +411,7 @@ class PostsStatsService {
 
     /**
      * Build a subquery/CTE for free_members count (Post-level)
-     * (Signed up on Post, Paid Elsewhere/Never)
+     * Payment features removed - all members are considered free members
      * @private
      * @param {StatsServiceOptions} options
      * @param {boolean} groupByUrl - Whether to group by attribution_url instead of attribution_id
@@ -437,29 +421,12 @@ class PostsStatsService {
         const knex = this.knex;
         const selectField = groupByUrl ? 'mce.attribution_url' : 'mce.attribution_id as post_id';
         const groupByField = groupByUrl ? 'mce.attribution_url' : 'mce.attribution_id';
-        const joinCondition = groupByUrl ? 'mce.attribution_url' : 'mce.attribution_id';
         const {dateFrom, dateTo} = getDateBoundaries(options);
         
+        // Payment features removed - all members are free members
         let subquery = knex('members_created_events as mce')
             .select(selectField)
             .countDistinct('mce.member_id as free_members')
-            .leftJoin('members_subscription_created_events as msce', function () {
-                this.on('mce.member_id', '=', 'msce.member_id')
-                    .andOn(joinCondition, '=', groupByUrl ? 'msce.attribution_url' : 'msce.attribution_id');
-                // Add attribution_type condition based on post_type filter
-                if (options.post_type === 'page') {
-                    this.andOnVal('msce.attribution_type', '=', 'page');
-                } else if (options.post_type === 'post') {
-                    this.andOnVal('msce.attribution_type', '=', 'post');
-                } else {
-                    // If no post_type specified, include both
-                    this.andOn(function () {
-                        this.on('msce.attribution_type', '=', knex.raw('?', ['post']))
-                            .orOn('msce.attribution_type', '=', knex.raw('?', ['page']));
-                    });
-                }
-            })
-            .whereNull('msce.id')
             .groupBy(groupByField);
 
         // Filter attribution_type based on post_type - only when grouping by post_id
@@ -490,103 +457,43 @@ class PostsStatsService {
 
     /**
      * Build a subquery/CTE for paid_members count (Post-level)
-     * (Paid conversion attributed to this post)
+     * Payment features removed - returns empty result
      * @private
      * @param {StatsServiceOptions} options
      * @param {boolean} groupByUrl - Whether to group by attribution_url instead of attribution_id
      * @returns {import('knex').Knex.QueryBuilder}
      */
     _buildPaidMembersSubquery(options, groupByUrl = false) {
-        const knex = this.knex;
-        const selectField = groupByUrl ? 'msce.attribution_url' : 'msce.attribution_id as post_id';
-        const groupByField = groupByUrl ? 'msce.attribution_url' : 'msce.attribution_id';
-        const {dateFrom, dateTo} = getDateBoundaries(options);
+        const selectField = groupByUrl ? 'attribution_url' : 'attribution_id as post_id';
         
-        let subquery = knex('members_subscription_created_events as msce')
-            .select(selectField)
-            .countDistinct('msce.member_id as paid_members')
-            .groupBy(groupByField);
-
-        // Filter attribution_type based on post_type - only when grouping by post_id
-        if (!groupByUrl) {
-            if (options.post_type === 'page') {
-                subquery = subquery.where('msce.attribution_type', 'page');
-            } else if (options.post_type === 'post') {
-                subquery = subquery.where('msce.attribution_type', 'post');
-            } else {
-                // If no post_type specified, include both
-                subquery = subquery.whereIn('msce.attribution_type', ['post', 'page']);
-            }
-        } else {
-            // When groupByUrl=true, include posts, pages, and system pages (url, tag, author)
-            if (options.post_type === 'page') {
-                subquery = subquery.where('msce.attribution_type', '!=', 'post');
-            } else if (options.post_type === 'post') {
-                subquery = subquery.where('msce.attribution_type', 'post');
-            } else {
-                // Include all types that can drive conversions
-                subquery = subquery.whereIn('msce.attribution_type', ['post', 'page', 'url', 'tag', 'author']);
-            }
-        }
-
-        applyDateFilter(subquery, dateFrom, dateTo, 'msce.created_at');
-        return subquery;
+        // Payment features removed - return empty result
+        return this.knex.select(selectField)
+            .select(this.knex.raw('0 as paid_members'))
+            .where(this.knex.raw('1 = 0')); // Always false condition
     }
 
     /**
      * Build a subquery/CTE for mrr sum (Post-level)
-     * (Paid Conversions Attributed to Post)
+     * Payment features removed - returns empty result
      * @private
      * @param {StatsServiceOptions} options
      * @param {boolean} groupByUrl - Whether to group by attribution_url instead of attribution_id
      * @returns {import('knex').Knex.QueryBuilder}
      */
     _buildMrrSubquery(options, groupByUrl = false) {
-        const selectField = groupByUrl ? 'msce.attribution_url' : 'msce.attribution_id as post_id';
-        const groupByField = groupByUrl ? 'msce.attribution_url' : 'msce.attribution_id';
-        const {dateFrom, dateTo} = getDateBoundaries(options);
+        const selectField = groupByUrl ? 'attribution_url' : 'attribution_id as post_id';
         
-        let subquery = this.knex('members_subscription_created_events as msce')
-            .select(selectField)
-            .sum('mpse.mrr_delta as mrr')
-            .join('members_paid_subscription_events as mpse', function () {
-                this.on('mpse.subscription_id', '=', 'msce.subscription_id');
-                this.andOn('mpse.member_id', '=', 'msce.member_id');
-            })
-            .groupBy(groupByField);
-
-        // Filter attribution_type based on post_type - only when grouping by post_id
-        if (!groupByUrl) {
-            if (options.post_type === 'page') {
-                subquery = subquery.where('msce.attribution_type', 'page');
-            } else if (options.post_type === 'post') {
-                subquery = subquery.where('msce.attribution_type', 'post');
-            } else {
-                // If no post_type specified, include both
-                subquery = subquery.whereIn('msce.attribution_type', ['post', 'page']);
-            }
-        } else {
-            // When groupByUrl=true, include posts, pages, and system pages (url, tag, author)
-            if (options.post_type === 'page') {
-                // Pages tab: Include actual pages AND system pages (everything except posts)
-                subquery = subquery.where('msce.attribution_type', '!=', 'post');
-            } else if (options.post_type === 'post') {
-                subquery = subquery.where('msce.attribution_type', 'post');
-            } else {
-                // Include all types that can drive conversions
-                subquery = subquery.whereIn('msce.attribution_type', ['post', 'page', 'url', 'tag', 'author']);
-            }
-        }
-
-        applyDateFilter(subquery, dateFrom, dateTo, 'msce.created_at');
-        return subquery;
+        // Payment features removed - return empty result
+        return this.knex.select(selectField)
+            .select(this.knex.raw('0 as mrr'))
+            .where(this.knex.raw('1 = 0')); // Always false condition
     }
 
     // --- Subqueries for getReferrersForPost ---
 
     /**
      * Build subquery for free members count per referrer for a specific post.
-     * (Signed up via Post/Referrer, Did NOT convert via SAME Post/Referrer)
+     * Payment features removed - all members are considered free members
      * @private
      * @param {string} postId
      * @param {StatsServiceOptions} options
@@ -596,19 +503,13 @@ class PostsStatsService {
         const knex = this.knex;
         const {dateFrom, dateTo} = getDateBoundaries(options);
 
-        // Simpler approach mirroring _buildFreeMembersSubquery
+        // Payment features removed - all members are free members
         let subquery = knex('members_created_events as mce')
             .select('mce.referrer_source as source')
             .countDistinct('mce.member_id as free_members')
-            .leftJoin('members_subscription_created_events as msce', function () {
-                this.on('mce.member_id', '=', 'msce.member_id')
-                    .andOn('mce.attribution_id', '=', 'msce.attribution_id') // Conversion must be for the SAME post
-                    .andOn('mce.referrer_source', '=', 'msce.referrer_source') // And the SAME referrer
-                    .andOnVal('msce.attribution_type', '=', 'post');
-            })
             .where('mce.attribution_id', postId)
             .where('mce.attribution_type', 'post')
-            .whereNull('msce.id') // Keep only signups where no matching paid conversion (same post/referrer) exists
+            .whereNotNull('mce.referrer_source')
             .groupBy('mce.referrer_source');
 
         applyDateFilter(subquery, dateFrom, dateTo, 'mce.created_at');
@@ -617,51 +518,32 @@ class PostsStatsService {
 
     /**
     * Build subquery for paid members count per referrer for a specific post.
-    * (Paid conversion attributed to this Post/Referrer)
+    * Payment features removed - returns empty result
     * @private
-    * @param {string} postId
-    * @param {StatsServiceOptions} options
+    * @param {string} _postId - Unused due to payment feature removal
+    * @param {StatsServiceOptions} _options - Unused due to payment feature removal
     * @returns {import('knex').Knex.QueryBuilder}
     */
-    _buildPaidReferrersSubquery(postId, options) {
-        const knex = this.knex;
-        const {dateFrom, dateTo} = getDateBoundaries(options);
-        let subquery = knex('members_subscription_created_events as msce')
-            .select('msce.referrer_source as source')
-            .countDistinct('msce.member_id as paid_members')
-            .where('msce.attribution_id', postId)
-            .where('msce.attribution_type', 'post')
-            .groupBy('msce.referrer_source');
-
-        applyDateFilter(subquery, dateFrom, dateTo, 'msce.created_at');
-        return subquery;
+    _buildPaidReferrersSubquery(_postId, _options) {
+        // Payment features removed - return empty result
+        return this.knex.select('referrer_source as source')
+            .select(this.knex.raw('0 as paid_members'))
+            .where(this.knex.raw('1 = 0')); // Always false condition
     }
 
     /**
      * Build subquery for MRR sum per referrer for a specific post.
-     * (MRR from paid conversions attributed to this Post/Referrer)
+     * Payment features removed - returns empty result
      * @private
-     * @param {string} postId
-     * @param {StatsServiceOptions} options
+     * @param {string} _postId - Unused due to payment feature removal
+     * @param {StatsServiceOptions} _options - Unused due to payment feature removal
      * @returns {import('knex').Knex.QueryBuilder}
      */
-    _buildMrrReferrersSubquery(postId, options) {
-        const knex = this.knex;
-        const {dateFrom, dateTo} = getDateBoundaries(options);
-        let subquery = knex('members_subscription_created_events as msce')
-            .select('msce.referrer_source as source')
-            .sum('mpse.mrr_delta as mrr')
-            .join('members_paid_subscription_events as mpse', function () {
-                this.on('mpse.subscription_id', '=', 'msce.subscription_id');
-                // Ensure we join on member_id as well for accuracy if subscription_id isn't unique across members? (Safeguard)
-                this.andOn('mpse.member_id', '=', 'msce.member_id');
-            })
-            .where('msce.attribution_id', postId)
-            .where('msce.attribution_type', 'post')
-            .groupBy('msce.referrer_source');
-
-        applyDateFilter(subquery, dateFrom, dateTo, 'msce.created_at');
-        return subquery;
+    _buildMrrReferrersSubquery(_postId, _options) {
+        // Payment features removed - return empty result
+        return this.knex.select('referrer_source as source')
+            .select(this.knex.raw('0 as mrr'))
+            .where(this.knex.raw('1 = 0')); // Always false condition
     }
 
     /**
@@ -1392,51 +1274,28 @@ class PostsStatsService {
         const {dateFrom, dateTo} = getDateBoundaries(options);
 
         try {
-            // Build free members query (modeled after _buildFreeMembersSubquery)
-            // Members who signed up on post but paid elsewhere/never
+            // Payment features removed - all members are considered free members
             let freeMembersQuery = this.knex('members_created_events as mce')
                 .select('mce.attribution_id as post_id')
                 .countDistinct('mce.member_id as free_members')
-                .leftJoin('members_subscription_created_events as msce', function () {
-                    this.on('mce.member_id', '=', 'msce.member_id')
-                        .andOn('mce.attribution_id', '=', 'msce.attribution_id')
-                        .andOnIn('msce.attribution_type', ['post', 'page']);
-                })
                 .whereIn('mce.attribution_type', ['post', 'page'])
                 .whereIn('mce.attribution_id', postIds)
-                .whereNull('msce.id')
                 .groupBy('mce.attribution_id');
 
             // Apply date filter to free members query
             applyDateFilter(freeMembersQuery, dateFrom, dateTo, 'mce.created_at');
 
-            // Build paid members query (modeled after _buildPaidMembersSubquery)
-            // Members whose paid conversion was attributed to this post
-            let paidMembersQuery = this.knex('members_subscription_created_events as msce')
-                .select('msce.attribution_id as post_id')
-                .countDistinct('msce.member_id as paid_members')
-                .whereIn('msce.attribution_type', ['post', 'page'])
-                .whereIn('msce.attribution_id', postIds)
-                .groupBy('msce.attribution_id');
+            // Execute query
+            const freeResults = await freeMembersQuery;
 
-            // Apply date filter to paid members query
-            applyDateFilter(paidMembersQuery, dateFrom, dateTo, 'msce.created_at');
-
-            // Execute both queries
-            const [freeResults, paidResults] = await Promise.all([
-                freeMembersQuery,
-                paidMembersQuery
-            ]);
-
-            // Combine results for each post
+            // Combine results for each post - no paid members since payment features are removed
             const combinedResults = postIds.map((postId) => {
                 const freeResult = freeResults.find(r => r.post_id === postId);
-                const paidResult = paidResults.find(r => r.post_id === postId);
 
                 return {
                     post_id: postId,
                     free_members: freeResult ? freeResult.free_members : 0,
-                    paid_members: paidResult ? paidResult.paid_members : 0
+                    paid_members: 0 // Payment features removed
                 };
             });
 

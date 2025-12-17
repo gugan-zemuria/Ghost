@@ -7,18 +7,16 @@ import incomingRecommendationsFixture from './responses/incoming_recommendations
 import invitesFixture from './responses/invites.json';
 import labelsFixture from './responses/labels.json';
 import meFixture from './responses/me.json';
-import newslettersFixture from './responses/newsletters.json';
-import offersFixture from './responses/offers.json';
+
 import recommendationsFixture from './responses/recommendations.json';
 import rolesFixture from './responses/roles.json';
 import settingsFixture from './responses/settings.json';
 import siteFixture from './responses/site.json';
 import themesFixture from './responses/themes.json';
-import tiersFixture from './responses/tiers.json';
+
 import usersFixture from './responses/users.json';
 import memberCountHistoryFixture from './responses/member_count_history.json';
 import mrrHistoryFixture from './responses/mrr_history.json';
-import newsletterStatsFixture from './responses/newsletter_stats.json';
 import linksFixture from './responses/links.json';
 import topPostsFixture from './responses/top_posts.json';
 import postReferrersFixture from './responses/post_referrers.json';
@@ -28,16 +26,15 @@ import {ConfigResponseType} from '../api/config';
 import {CustomThemeSettingsResponseType} from '../api/customThemeSettings';
 import {InvitesResponseType} from '../api/invites';
 import {LabelsResponseType} from '../api/labels';
-import {NewslettersResponseType} from '../api/newsletters';
-import {OffersResponseType} from '../api/offers';
+
 import {IncomingRecommendationResponseType, RecommendationResponseType} from '../api/recommendations';
 import {RolesResponseType} from '../api/roles';
 import {SettingsResponseType} from '../api/settings';
 import {ThemesResponseType} from '../api/themes';
-import {TiersResponseType} from '../api/tiers';
+
 import {UsersResponseType} from '../api/users';
 import {ExternalLink} from '../routing';
-import {MemberCountHistoryResponseType, MrrHistoryResponseType, NewsletterStatsResponseType, TopPostsStatsResponseType, PostReferrersResponseType} from '../api/stats';
+import {MemberCountHistoryResponseType, MrrHistoryResponseType, TopPostsStatsResponseType, PostReferrersResponseType} from '../api/stats';
 import {LinkResponseType} from '../api/links';
 
 interface MockRequestConfig {
@@ -65,16 +62,12 @@ export const responseFixtures = {
     site: siteFixture,
     invites: invitesFixture as InvitesResponseType,
     customThemeSettings: customThemeSettingsFixture as CustomThemeSettingsResponseType,
-    tiers: tiersFixture as TiersResponseType,
     labels: labelsFixture as LabelsResponseType,
-    offers: offersFixture as OffersResponseType,
     themes: themesFixture as ThemesResponseType,
-    newsletters: newslettersFixture as NewslettersResponseType,
     actions: actionsFixture as ActionsResponseType,
     latestPost: {posts: [{id: '1', url: `${siteFixture.site.url}/test-post/`}]},
     memberCountHistory: memberCountHistoryFixture as MemberCountHistoryResponseType,
     mrrHistory: mrrHistoryFixture as MrrHistoryResponseType,
-    newsletterStats: newsletterStatsFixture as NewsletterStatsResponseType,
     links: linksFixture as LinkResponseType,
     topPosts: topPostsFixture as TopPostsStatsResponseType,
     postReferrers: postReferrersFixture as PostReferrersResponseType
@@ -154,8 +147,7 @@ export const settingsWithStripe = updatedSettingsResponse([
 export const limitRequests = {
     browseUsers: {method: 'GET', path: '/users/?limit=100&include=roles', response: responseFixtures.users},
     browseInvites: {method: 'GET', path: '/invites/?limit=100&include=roles', response: responseFixtures.invites},
-    browseRoles: {method: 'GET', path: '/roles/?limit=100', response: responseFixtures.roles},
-    browseNewslettersLimit: {method: 'GET', path: '/newsletters/?filter=status%3Aactive&limit=1', response: responseFixtures.newsletters}
+    browseRoles: {method: 'GET', path: '/roles/?limit=100', response: responseFixtures.roles}
 };
 
 export const globalDataRequests = {
@@ -168,7 +160,6 @@ export const globalDataRequests = {
 export const statsRequests = {
     browseMemberCountHistory: {method: 'GET', path: /^\/stats\/member_count\//, response: responseFixtures.memberCountHistory},
     browseMrrHistory: {method: 'GET', path: '/stats/mrr/', response: responseFixtures.mrrHistory},
-    browseNewsletterStats: {method: 'GET', path: /^\/stats\/newsletter-stats\//, response: responseFixtures.newsletterStats},
     browseTopPosts: {method: 'GET', path: /^\/stats\/top-posts\//, response: responseFixtures.topPosts},
     browsePostReferrers: {method: 'GET', path: /^\/stats\/posts\/[^/]+\/top-referrers/, response: responseFixtures.postReferrers},
     browseLinks: {method: 'GET', path: /^\/links\//, response: responseFixtures.links}
@@ -181,7 +172,7 @@ export const postsRequests = {
         email: {email_count: 1000, opened_count: 450},
         count: {clicks: 120}
     }]}},
-    browseNewsletterStats: {method: 'GET', path: /^\/stats\/newsletter-stats\//, response: responseFixtures.newsletterStats},
+    
     browseLinks: {method: 'GET', path: /^\/links\//, response: responseFixtures.links}
 };
 

@@ -11,7 +11,7 @@ import {responseFixtures} from '@tryghost/admin-x-framework/test/acceptance';
 import {vi} from 'vitest';
 
 // Import types from API modules
-import type {NewsletterStatsResponseType, TopPostsStatsResponseType} from '@tryghost/admin-x-framework/api/stats';
+import type {TopPostsStatsResponseType} from '@tryghost/admin-x-framework/api/stats';
 
 // Re-export centralized utilities for convenience
 export {
@@ -53,8 +53,7 @@ export const setupStatsAppMocks = () => {
     const mockGetSettingValue = vi.fn();
 
     // Set up ALL mocks with sensible defaults using centralized fixtures
-    mockApiHook<NewsletterStatsResponseType>(mockUseNewsletterStatsByNewsletterId, responseFixtures.newsletterStats);
-    mockApiHook<NewsletterStatsResponseType>(mockUseSubscriberCountByNewsletterId, responseFixtures.newsletterStats);
+
     mockApiHook<TopPostsStatsResponseType>(mockUseTopPostsStats, responseFixtures.topPosts);
     mockUseGlobalData.mockReturnValue(defaultMockData.globalData);
     mockGetSettingValue.mockReturnValue('{}');

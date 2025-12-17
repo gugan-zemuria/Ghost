@@ -277,9 +277,9 @@ body:not(.gh-body-fullscreen) .gh-viewport {
 .gh-nav-menu-icon {
     flex-shrink: 0;
     margin-right: 12px;
-    margin-left: -6px;
-    width: 32px;
-    height: 32px;
+    /* margin-left: 6px; */
+    width: 170px;
+    height: 52px;
     background-color: transparent;
     background-size: cover;
     border-radius: 6px;
@@ -570,20 +570,20 @@ body:not(.gh-body-fullscreen) .gh-viewport {
 .gh-nav-list .active {
     position: relative;
     color: var(--black);
-    background-color: var(--mainmenu-color-active-bg);
+    /* background-color: var(--mainmenu-color-active-bg); */
     font-weight: 600;
 }
 
 .gh-nav-list a:not(.active):hover,
 .gh-nav-list button.main-menu-item:hover {
     color: var(--darkgrey);
-    background: var(--mainmenu-color-hover-bg);
+    /* background: var(--mainmenu-color-hover-bg); */
     opacity: 1;
 }
 
-.gh-nav-list a:hover .gh-nav-member-count {
+/* .gh-nav-list a:hover .gh-nav-member-count {
     background: color-mod(var(--mainmenu-color-active-bg) l(-5%));
-}
+} */
 
 /* Icons */
 .gh-nav-list svg {

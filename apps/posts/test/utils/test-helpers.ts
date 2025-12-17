@@ -14,7 +14,7 @@ import {vi} from 'vitest';
 
 // Import types from API modules
 import type {LinkResponseType} from '@tryghost/admin-x-framework/api/links';
-import type {MrrHistoryResponseType, NewsletterStatsResponseType, PostGrowthStatsResponseType, PostReferrersResponseType} from '@tryghost/admin-x-framework/api/stats';
+import type {MrrHistoryResponseType, PostGrowthStatsResponseType, PostReferrersResponseType} from '@tryghost/admin-x-framework/api/stats';
 import type {PostsResponseType} from '@tryghost/admin-x-framework/api/posts';
 
 // Create a test wrapper with QueryClient
@@ -153,9 +153,7 @@ export const setupPostsAppMocks = async () => {
 
     // Set up ALL mocks with sensible defaults using centralized fixtures
     mockApiHook<PostsResponseType>(mockGetPost, defaultMockData.postsResponse);
-    mockApiHook<NewsletterStatsResponseType>(mockUseNewsletterStatsByNewsletterId, responseFixtures.newsletterStats);
-    mockApiHook<NewsletterStatsResponseType>(mockUseNewsletterBasicStats, responseFixtures.newsletterStats);
-    mockApiHook<NewsletterStatsResponseType>(mockUseNewsletterClickStats, responseFixtures.newsletterStats);
+
     mockApiHook<PostReferrersResponseType>(mockUsePostReferrers, responseFixtures.postReferrers);
     mockApiHook<PostGrowthStatsResponseType>(mockUsePostGrowthStats, defaultMockData.growthStats);
     mockApiHook<MrrHistoryResponseType>(mockUseMrrHistory, responseFixtures.mrrHistory);

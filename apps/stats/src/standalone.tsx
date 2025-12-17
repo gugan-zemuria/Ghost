@@ -6,7 +6,7 @@ import {AppSettings} from '@tryghost/admin-x-framework';
 // Use test overrides if available, otherwise use defaults
 const defaultAppSettings: AppSettings = {
     paidMembersEnabled: true,
-    newslettersEnabled: true,
+    newslettersEnabled: false,
     analytics: {
         emailTrackOpens: true,
         emailTrackClicks: true,

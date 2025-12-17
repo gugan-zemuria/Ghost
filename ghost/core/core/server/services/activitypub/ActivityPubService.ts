@@ -89,11 +89,16 @@ export class ActivityPubService {
                 }
             });
 
+            if (!res.ok) {
+                this.logging.warn(`ActivityPub endpoint not available (status: ${res.status}). This is expected if ActivityPub is disabled.`);
+                return null;
+            }
+
             const body = await res.json();
 
             return body.webhook_secret;
         } catch (err: unknown) {
-            this.logging.error(`Could not get webhook secret for ActivityPub ${err}`);
+            this.logging.warn(`Could not get webhook secret for ActivityPub: ${err}. This is expected if ActivityPub is disabled.`);
             return null;
         }
     }
@@ -142,7 +147,7 @@ export class ActivityPubService {
         const secret = await this.getWebhookSecret();
 
         if (!secret) {
-            this.logging.error('No webhook secret found - cannot initialise');
+            this.logging.warn('No webhook secret found - ActivityPub webhooks will not be initialised. This is expected if ActivityPub is disabled.');
             return;
         }
 

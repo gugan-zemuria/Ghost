@@ -43,9 +43,7 @@ module.exports = {
         return require('./media');
     },
 
-    get tiers() {
-        return require('./tiers');
-    },
+
 
     get webhooks() {
         return require('./webhooks');

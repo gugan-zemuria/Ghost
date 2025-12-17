@@ -11,12 +11,8 @@ export const modalPaths: {[key: string]: ModalName} = {
     'staff/invite': 'InviteUserModal',
     'staff/:slug': 'UserDetailModal',
     'staff/:slug/edit': 'UserDetailModal',
-    'portal/edit': 'PortalModal',
-    'tiers/add': 'TierDetailModal',
-    'tiers/:id': 'TierDetailModal',
-    'stripe-connect': 'StripeConnectModal',
-    'newsletters/new': 'AddNewsletterModal',
-    'newsletters/:id': 'NewsletterDetailModal',
+
+
     'history/view': 'HistoryModal',
     'history/view/:user': 'HistoryModal',
     'integrations/zapier': 'ZapierModal',
@@ -30,9 +26,7 @@ export const modalPaths: {[key: string]: ModalName} = {
     'recommendations/edit': 'EditRecommendationModal',
     'announcement-bar/edit': 'AnnouncementBarModal',
     'embed-signup-form/show': 'EmbedSignupFormModal',
-    'offers/edit': 'OffersContainerModal',
-    'offers/edit/:id': 'OffersContainerModal',
-    'offers/new': 'OffersContainerModal',
+
     'explore/testimonial': 'TestimonialsModal',
     about: 'AboutModal'
 };
