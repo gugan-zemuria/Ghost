@@ -405,6 +405,33 @@
             "defaultValue": null,
             "type": "string"
         },
+        "smtp_host": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "smtp_port": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "smtp_user": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "smtp_password": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "smtp_secure": {
+            "defaultValue": "tls",
+            "validations": {
+                "isIn": [["tls", "ssl", "none"]]
+            },
+            "type": "string"
+        },
+        "smtp_service": {
+            "defaultValue": null,
+            "type": "string"
+        },
         "email_track_opens": {
             "defaultValue": "true",
             "validations": {

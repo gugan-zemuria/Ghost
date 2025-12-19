@@ -117,6 +117,20 @@ test/functional/*.png
 /ghost/core/config.*.json
 /ghost/core/config.*.jsonc
 
+# Sensitive configuration files
+**/config.development.json
+**/config.production.json
+**/*smtp*password*
+**/*oauth*secret*
+**/*api*key*
+*.env.local
+*.env.production
+*.env.development
+
+# SMTP setup scripts with credentials
+update-smtp-password.sh
+setup-gmail-smtp.md
+
 # Built asset files
 /ghost/core/core/built
 /ghost/core/core/frontend/public/ghost.min.css

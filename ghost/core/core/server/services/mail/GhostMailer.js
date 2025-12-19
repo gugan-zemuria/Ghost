@@ -98,13 +98,68 @@ module.exports = class GhostMailer {
         transport = transport.toLowerCase();
 
         // nodemailer mutates the options passed to createTransport
-        const options = config.get('mail') && _.clone(config.get('mail').options) || {};
+        let options = config.get('mail') && _.clone(config.get('mail').options) || {};
+
+        // Check if SMTP is configured via settings
+        const smtpHost = settingsCache.get('smtp_host');
+        const smtpService = settingsCache.get('smtp_service');
+        const smtpUser = settingsCache.get('smtp_user');
+        
+        if ((smtpHost || smtpService) && smtpUser) {
+            transport = 'smtp';
+            options = this.getSMTPOptions();
+        }
 
         this.state = {
             usingDirect: transport === 'direct',
-            usingMailgun: transport === 'mailgun'
+            usingMailgun: transport === 'mailgun',
+            usingSMTP: transport === 'smtp'
         };
         this.transport = nodemailer(transport, options);
+    }
+
+    getSMTPOptions() {
+        const smtpService = settingsCache.get('smtp_service');
+        const smtpHost = settingsCache.get('smtp_host');
+        const smtpPort = settingsCache.get('smtp_port');
+        const smtpUser = settingsCache.get('smtp_user');
+        const smtpPassword = settingsCache.get('smtp_password');
+        const smtpSecure = settingsCache.get('smtp_secure') || 'tls';
+
+        // Validate required fields
+        if (!smtpUser) {
+            throw new Error('SMTP username is required');
+        }
+
+        const options = {
+            auth: {
+                user: smtpUser,
+                pass: smtpPassword || ''
+            }
+        };
+
+        if (smtpService) {
+            // Use predefined service
+            options.service = smtpService;
+        } else if (smtpHost) {
+            // Use custom SMTP settings
+            options.host = smtpHost;
+            options.port = parseInt(smtpPort) || 587;
+            
+            if (smtpSecure === 'ssl') {
+                options.secure = true;
+            } else if (smtpSecure === 'tls') {
+                options.secure = false;
+                options.requireTLS = true;
+            } else {
+                options.secure = false;
+                options.requireTLS = false;
+            }
+        } else {
+            throw new Error('SMTP host or service is required');
+        }
+
+        return options;
     }
 
     /**
@@ -146,6 +201,10 @@ module.exports = class GhostMailer {
             return this.handleDirectTransportResponse(response);
         }
 
+        if (this.state.usingSMTP) {
+            return tpl(messages.messageSent);
+        }
+
         return response;
     }
 
@@ -158,6 +217,11 @@ module.exports = class GhostMailer {
                     value: Date.now() - startTime,
                     statusCode: 200
                 });
+            } else if (this.state.usingSMTP) {
+                metrics.metric('smtp-send-transactional-mail', {
+                    value: Date.now() - startTime,
+                    statusCode: 200
+                });
             }
 
             return response;
@@ -166,6 +230,11 @@ module.exports = class GhostMailer {
                 metrics.metric('mailgun-send-transactional-mail', {
                     value: Date.now() - startTime,
                     statusCode: err.status
+                });
+            } else if (this.state.usingSMTP) {
+                metrics.metric('smtp-send-transactional-mail', {
+                    value: Date.now() - startTime,
+                    statusCode: err.status || 500
                 });
             }
             throw createMailError({
