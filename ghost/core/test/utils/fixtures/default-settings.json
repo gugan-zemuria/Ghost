@@ -428,6 +428,22 @@
             "defaultValue": null,
             "type": "string"
         },
+        "oauth_google_client_id": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "oauth_google_client_secret": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "oauth_google_enabled": {
+            "defaultValue": false,
+            "validations": {
+                "isEmpty": false,
+                "isIn": [["true", "false"]]
+            },
+            "type": "boolean"
+        },
         "email_track_opens": {
             "defaultValue": "true",
             "validations": {

@@ -6,7 +6,7 @@ import {authenticateSession, invalidateSession} from 'ember-simple-auth/test-sup
 import {beforeEach, describe, it} from 'mocha';
 import {blur, click, currentRouteName, currentURL, fillIn, find, findAll, triggerEvent, typeIn, waitFor} from '@ember/test-helpers';
 import {cleanupMockAnalyticsApps, mockAnalyticsApps} from '../helpers/mock-analytics-apps';
-import {datepickerSelect} from 'ember-power-datepicker/test-support';
+import {datepickerSelect} from '../helpers/datepicker-select';
 import {editorSelector, pasteInEditor, titleSelector} from '../helpers/editor';
 import {enableLabsFlag} from '../helpers/labs-flag';
 import {expect} from 'chai';

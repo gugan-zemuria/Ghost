@@ -7,6 +7,9 @@ const {legacyApiPathMatch} = require('../../../services/api-version-compatibilit
 const tpl = require('@tryghost/tpl');
 const _ = require('lodash');
 
+// Initialize models to ensure ApiKey model is available
+models.init();
+
 const messages = {
     incorrectAuthHeaderFormat: 'Authorization header format is "Authorization: Ghost [token]"',
     invalidTokenWithMessage: 'Invalid token: {message}',
@@ -121,7 +124,7 @@ const authenticateWithToken = async function apiKeyAuthenticateWithToken(origina
         });
     }
 
-    const apiKey = await models.ApiKey.findOne({id: apiKeyId}, {withRelated: ['integration']});
+    const apiKey = await models['ApiKey'].findOne({id: apiKeyId}, {withRelated: ['integration']});
 
     if (!apiKey) {
         throw new errors.UnauthorizedError({
@@ -186,7 +189,7 @@ const authenticateWithToken = async function apiKeyAuthenticateWithToken(origina
 
     if (apiKey.get('user_id')) {
         // fetch the user and store it on the request for later checks and logging
-        const user = await models.User.findOne(
+        const user = await models['User'].findOne(
             {id: apiKey.get('user_id'), status: 'active'},
             {require: true}
         );

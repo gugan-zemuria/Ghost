@@ -246,6 +246,13 @@ module.exports = function apiRoutes() {
     router.post('/session/verify', shared.middleware.brute.sendVerificationCode, http(api.session.sendVerification));
     router.put('/session/verify', shared.middleware.brute.userVerification, http(api.session.verify));
 
+    // ## OAuth - Direct middleware approach (public routes, no auth required)
+    const oauthMiddleware = require('../../../../api/endpoints/oauth-middleware');
+    router.get('/auth/google', mw.publicAdminApi, oauthMiddleware.initiateGoogle);
+    router.get('/auth/google/', mw.publicAdminApi, oauthMiddleware.initiateGoogle);
+    router.get('/auth/google/callback', mw.publicAdminApi, oauthMiddleware.handleGoogleCallback);
+    router.get('/auth/google/callback/', mw.publicAdminApi, oauthMiddleware.handleGoogleCallback);
+
     // ## Identity
     router.get('/identities', mw.authAdminApi, http(api.identities.read));
 

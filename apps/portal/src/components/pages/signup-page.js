@@ -3,10 +3,9 @@ import ActionButton from '../common/action-button';
 import AppContext from '../../app-context';
 import CloseButton from '../common/close-button';
 import SiteTitleBackButton from '../common/site-title-back-button';
-// Payment and newsletter functionality removed
 import InputForm from '../common/input-form';
 import {ValidateInputForm} from '../../utils/form';
-import {isInviteOnly, isFreeSignupAllowed, isPaidMembersOnly, isSignupAllowed, isSigninAllowed} from '../../utils/helpers';
+import {isInviteOnly, isFreeSignupAllowed, isPaidMembersOnly, isSignupAllowed, isSigninAllowed, hasOnlyFreePlan, hasFreeProductPrice, freeHasBenefitsOrDescription, getSitePrices} from '../../utils/helpers';
 import {ReactComponent as InvitationIcon} from '../../images/icons/invitation.svg';
 import {interceptAnchorClicks} from '../../utils/links';
 import {t} from '../../utils/i18n';
@@ -541,7 +540,7 @@ class SignupPage extends React.Component {
     renderSubmitButton() {
         const {action, site, brandColor, pageQuery} = this.context;
 
-        if (isInviteOnly({site}) || !hasAvailablePrices({site, pageQuery})) {
+        if (isInviteOnly({site}) || !hasFreeProductPrice({site})) {
             return null;
         }
 
@@ -550,8 +549,6 @@ class SignupPage extends React.Component {
 
         if (hasOnlyFreePlan({site}) || showOnlyFree) {
             label = t('Sign up');
-        } else {
-            return null;
         }
 
         let isRunning = false;
@@ -581,37 +578,12 @@ class SignupPage extends React.Component {
     }
 
     renderProducts() {
-        const {site, pageQuery} = this.context;
-        const products = getSiteProducts({site, pageQuery});
-        const errors = this.state.errors || {};
-        const priceErrors = {};
-
-        // If we have at least one error, set an error message for the current selected plan
-        if (Object.keys(errors).length > 0 && this.state.plan) {
-            priceErrors[this.state.plan] = t('Please fill in required fields');
-        }
-
-        return (
-            <>
-                <ProductsSection
-                    handleChooseSignup={(...args) => this.handleChooseSignup(...args)}
-                    products={products}
-                    onPlanSelect={this.handleSelectPlan}
-                    errors={priceErrors}
-                />
-            </>
-        );
+        // No paid products in payment-free system - return null
+        return null;
     }
 
     renderFreeTrialMessage() {
-        const {site, pageQuery} = this.context;
-        if (hasFreeTrialTier({site, pageQuery}) && !isInviteOnly({site}) && hasAvailablePrices({site, pageQuery})) {
-            return (
-                <p className='gh-portal-free-trial-notification' data-testid="free-trial-notification-text">
-                    {t('After a free trial ends, you will be charged the regular price for the tier you\'ve chosen. You can always cancel before then.')}
-                </p>
-            );
-        }
+        // No free trials in payment-free system
         return null;
     }
 
@@ -652,8 +624,8 @@ class SignupPage extends React.Component {
             return this.renderPaidMembersOnlyMessage();
         }
 
-        // Signup is not allowed or no prices are available: block signup with the relevant message, offer signin when available
-        if (!isSignupAllowed({site}) || !hasAvailablePrices({site, pageQuery})) {
+        // Signup is not allowed: block signup with the relevant message, offer signin when available
+        if (!isSignupAllowed({site}) || !hasFreeProductPrice({site})) {
             if (!isSigninAllowed({site})) {
                 return this.renderMembersDisabledMessage();
             }
@@ -767,7 +739,7 @@ class SignupPage extends React.Component {
             );
         }
 
-        if (!hasAvailablePrices({site, pageQuery}) || isInviteOnly({site}) || !isSignupAllowed({site})) {
+        if (!hasFreeProductPrice({site}) || isInviteOnly({site}) || !isSignupAllowed({site})) {
             return (
                 <InvitationIcon className='gh-portal-icon gh-portal-icon-invitation' />
             );

@@ -99,9 +99,9 @@
 }
 
 .gh-flow-content .gh-btn {
-    display: block;
-    margin: 40px auto 0;
-    max-width: 400px;
+    display: flex;
+    margin: 0 auto 0;
+    /* max-width: 400px; */
 }
 
 .gh-setup .gh-flow-content .gh-btn {

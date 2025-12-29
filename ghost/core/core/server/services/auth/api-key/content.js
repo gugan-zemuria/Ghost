@@ -3,6 +3,9 @@ const errors = require('@tryghost/errors');
 const limitService = require('../../../services/limits');
 const tpl = require('@tryghost/tpl');
 
+// Initialize models to ensure ApiKey model is available
+models.init();
+
 const messages = {
     invalidRequest: 'Invalid Request',
     unknownContentApiKey: 'Unknown Content API Key',
@@ -25,7 +28,7 @@ const authenticateContentApiKey = async function authenticateContentApiKey(req, 
     let key = req.query.key;
 
     try {
-        const apiKey = await models.ApiKey.findOne({secret: key}, {withRelated: ['integration']});
+        const apiKey = await models['ApiKey'].findOne({secret: key}, {withRelated: ['integration']});
 
         if (!apiKey) {
             return next(new errors.UnauthorizedError({

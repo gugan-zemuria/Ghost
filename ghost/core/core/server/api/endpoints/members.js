@@ -176,108 +176,34 @@ const controller = {
     },
 
     editSubscription: {
-        statusCode: 200,
+        statusCode: 404,
         headers: {
             cacheInvalidate: false
-        },
-        options: [
-            'id',
-            'subscription_id'
-        ],
-        data: [
-            'cancel_at_period_end',
-            'status'
-        ],
-        validation: {
-            options: {
-                id: {
-                    required: true
-                },
-                subscription_id: {
-                    required: true
-                }
-            },
-            data: {
-                cancel_at_period_end: {
-                    required: true
-                },
-                status: {
-                    values: ['canceled']
-                }
-            }
         },
         permissions: {
             method: 'edit'
         },
-        async query(frame) {
-            if (frame.data.status === 'canceled') {
-                await membersService.api.members.cancelSubscription({
-                    id: frame.options.id,
-                    subscription: {
-                        subscription_id: frame.options.subscription_id
-                    }
-                });
-            } else {
-                await membersService.api.members.updateSubscription({
-                    id: frame.options.id,
-                    subscription: {
-                        subscription_id: frame.options.subscription_id,
-                        cancel_at_period_end: frame.data.cancel_at_period_end
-                    }
-                });
-            }
-            let model = await membersService.api.memberBREADService.read({id: frame.options.id});
-            if (!model) {
-                throw new errors.NotFoundError({
-                    message: tpl(messages.memberNotFound)
-                });
-            }
-
-            return model;
+        async query() {
+            // Payment functionality disabled - subscriptions not supported
+            throw new errors.NotFoundError({
+                message: 'Subscription management is not available in this configuration.'
+            });
         }
     },
 
     createSubscription: {
-        statusCode: 200,
+        statusCode: 404,
         headers: {
             cacheInvalidate: false
-        },
-        options: [
-            'id'
-        ],
-        data: [
-            'stripe_price_id'
-        ],
-        validation: {
-            options: {
-                id: {
-                    required: true
-                }
-            },
-            data: {
-                stripe_price_id: {
-                    required: true
-                }
-            }
         },
         permissions: {
             method: 'edit'
         },
-        async query(frame) {
-            await membersService.api.members.createSubscription({
-                id: frame.options.id,
-                subscription: {
-                    stripe_price_id: frame.data.stripe_price_id
-                }
+        async query() {
+            // Payment functionality disabled - subscriptions not supported
+            throw new errors.NotFoundError({
+                message: 'Subscription creation is not available in this configuration.'
             });
-            let model = await membersService.api.memberBREADService.read({id: frame.options.id});
-            if (!model) {
-                throw new errors.NotFoundError({
-                    message: tpl(messages.memberNotFound)
-                });
-            }
-
-            return model;
         }
     },
 
@@ -470,6 +396,7 @@ const controller = {
     },
 
     mrrStats: {
+        statusCode: 404,
         headers: {
             cacheInvalidate: false
         },
@@ -477,22 +404,10 @@ const controller = {
             method: 'browse'
         },
         async query() {
-            const mrrData = await membersService.api.events.getMRR();
-            const mrrStats = Object.keys(mrrData).map((curr) => {
-                return {
-                    currency: curr,
-                    data: mrrData[curr].map((d) => {
-                        return Object.assign({}, {
-                            date: moment(d.date).format('YYYY-MM-DD'),
-                            value: d.mrr
-                        });
-                    })
-                };
+            // Payment functionality disabled - MRR stats not available
+            throw new errors.NotFoundError({
+                message: 'MRR statistics are not available in this configuration.'
             });
-            return {
-                resource: 'mrr',
-                data: mrrStats
-            };
         }
     },
 

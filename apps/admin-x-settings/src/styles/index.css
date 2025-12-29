@@ -60,3 +60,56 @@
         transform: translateY(0px) scale(1.0);
     }
 }
+/* Remove hover and active background effects from sidebar navigation */
+#admin-x-settings-sidebar a:hover {
+    background-color: transparent !important;
+    color: #000 !important; /* Highlight text on hover */
+}
+
+#admin-x-settings-sidebar a:focus {
+    background-color: transparent !important;
+    color: #000 !important; /* Highlight text on focus */
+}
+
+/* Remove hover and active effects from About Ghost link */
+#admin-x-settings-sidebar a.w-100:hover {
+    background-color: transparent !important;
+    color: #000 !important; /* Highlight text on hover */
+}
+
+#admin-x-settings-sidebar a.w-100:focus {
+    background-color: transparent !important;
+    color: #000 !important; /* Highlight text on focus */
+}
+
+/* Remove active/current state background for navigation items but keep text highlighted */
+#admin-x-settings-sidebar a.bg-grey-200 {
+    background-color: transparent !important;
+    color: #000 !important; /* Keep active text highlighted */
+}
+
+/* Dark mode overrides */
+.dark #admin-x-settings-sidebar a:hover {
+    background-color: transparent !important;
+    color: #fff !important; /* White text on hover in dark mode */
+}
+
+.dark #admin-x-settings-sidebar a:focus {
+    background-color: transparent !important;
+    color: #fff !important; /* White text on focus in dark mode */
+}
+
+.dark #admin-x-settings-sidebar a.bg-grey-200 {
+    background-color: transparent !important;
+    color: #fff !important; /* White text for active state in dark mode */
+}
+
+.dark #admin-x-settings-sidebar a.w-100:hover {
+    background-color: transparent !important;
+    color: #fff !important; /* White text for About Ghost hover in dark mode */
+}
+
+.dark #admin-x-settings-sidebar a.w-100:focus {
+    background-color: transparent !important;
+    color: #fff !important; /* White text for About Ghost focus in dark mode */
+}

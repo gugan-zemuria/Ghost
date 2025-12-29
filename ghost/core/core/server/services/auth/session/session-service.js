@@ -41,12 +41,13 @@ totp.options = {
  * @prop {(req: Req, res: Res) => Promise<User | null>} getUserForSession
  * @prop {(req: Req, res: Res) => Promise<void>} removeUserForSession
  * @prop {(req: Req, res: Res, user: User) => Promise<void>} createSessionForUser
- * @prop {(req: Req, res: Res) => Promise<void>} createVerifiedSessionForUser
+ * @prop {(req: Req, res: Res, user: User) => Promise<void>} createVerifiedSessionForUser
  * @prop {(req: Req, res: Res) => Promise<void>} verifySession
  * @prop {(req: Req, res: Res) => Promise<void>} sendAuthCodeToUser
  * @prop {(req: Req, res: Res) => Promise<boolean>} verifyAuthCodeForUser
  * @prop {(req: Req, res: Res) => Promise<boolean>} isVerifiedSession
  * @prop {() => boolean} isVerificationRequired
+ * @prop {(req: Req, res: Res) => Promise<string>} generateAuthCodeForUser
  */
 
 /**
@@ -56,9 +57,9 @@ totp.options = {
  * @param {(req: Req) => string} deps.getOriginOfRequest
  * @param {(key: 'require_email_mfa' | 'admin_session_secret' | 'title') => boolean | string} deps.getSettingsCache
  * @param {() => string} deps.getBlogLogo
- * @param {import('../../core/core/server/services/mail').GhostMailer} deps.mailer
- * @param {import('../../core/core/server/services/i18n').t} deps.t
- * @param {import('../../core/core/shared/url-utils')} deps.urlUtils
+ * @param {any} deps.mailer
+ * @param {any} deps.t
+ * @param {any} deps.urlUtils
  * @param {() => boolean} deps.isStaffDeviceVerificationDisabled
  * @returns {SessionService}
  */
@@ -205,6 +206,7 @@ module.exports = function createSessionService({
         const geojsUrl = `https://get.geojs.io/v1/ip/geo/${encodeURIComponent(ip)}.json`;
 
         try {
+            // @ts-ignore - got v11 typing issue
             const response = await got(geojsUrl, gotOpts).json();
 
             const {city, region, country} = response || {};
@@ -219,6 +221,10 @@ module.exports = function createSessionService({
         }
     }
 
+    /**
+     * @param {string} userAgent
+     * @param {string} ip
+     */
     async function getDeviceDetails(userAgent, ip) {
         const parser = new UAParser();
         parser.setUA(userAgent);
@@ -255,6 +261,8 @@ module.exports = function createSessionService({
                 message: 'Could not fetch user from the session.'
             });
         }
+
+
 
         const recipient = user.get('email');
         const siteTitle = getSettingsCache('title');

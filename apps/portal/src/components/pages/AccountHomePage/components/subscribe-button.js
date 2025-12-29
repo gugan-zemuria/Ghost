@@ -1,29 +1,29 @@
 import AppContext from '../../../../app-context';
 import ActionButton from '../../../common/action-button';
-import {isSignupAllowed, hasAvailablePrices} from '../../../../utils/helpers';
+import {isSignupAllowed} from '../../../../utils/helpers';
 import {useContext} from 'react';
 import {t} from '../../../../utils/i18n';
 
 const SubscribeButton = () => {
     const {site, action, brandColor, doAction} = useContext(AppContext);
 
-    if (!isSignupAllowed({site}) || !hasAvailablePrices({site})) {
+    if (!isSignupAllowed({site})) {
         return null;
     }
-    const isRunning = ['checkoutPlan:running'].includes(action);
+    const isRunning = ['signup:running'].includes(action);
 
-    const openPlanPage = () => {
+    const openSignupPage = () => {
         doAction('switchPage', {
-            page: 'accountPlan',
+            page: 'signup',
             lastPage: 'accountHome'
         });
     };
     return (
         <ActionButton
-            dataTestId={'view-plans'}
+            dataTestId={'subscribe-free'}
             isRunning={isRunning}
-            label={t('View plans')}
-            onClick={() => openPlanPage()}
+            label={t('Subscribe for free')}
+            onClick={() => openSignupPage()}
             brandColor={brandColor}
             style={{width: '100%'}}
         />

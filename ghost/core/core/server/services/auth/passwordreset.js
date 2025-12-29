@@ -8,6 +8,9 @@ const models = require('../../models');
 const urlUtils = require('../../../shared/url-utils');
 const mail = require('../mail');
 
+// Initialize models to ensure User model is available
+models.init();
+
 const messages = {
     userNotFound: 'User not found.',
     tokenLocked: 'Token locked',
@@ -40,7 +43,7 @@ function generateToken(email, settingsAPI, transaction) {
         .then((response) => {
             dbHash = response.settings[0].value;
 
-            return models.User.getByEmail(email, options);
+            return models['User'].getByEmail(email, options);
         })
         .then((user) => {
             if (!user) {
@@ -103,7 +106,7 @@ function doReset(options, tokenParts, settingsAPI) {
         .then((response) => {
             dbHash = response.settings[0].value;
 
-            return models.User.getByEmail(tokenParts.email, options);
+            return models['User'].getByEmail(tokenParts.email, options);
         })
         .then((user) => {
             if (!user) {
@@ -135,7 +138,7 @@ function doReset(options, tokenParts, settingsAPI) {
                 return Promise.reject(error);
             }
 
-            return models.User.changePassword({
+            return models['User'].changePassword({
                 oldPassword: oldPassword,
                 newPassword: newPassword,
                 user_id: user.id

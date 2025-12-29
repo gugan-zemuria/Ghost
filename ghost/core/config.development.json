@@ -1,3 +1,15 @@
 {
-    "enableDeveloperExperiments": true
+    "enableDeveloperExperiments": true,
+    "mail": {
+        "transport": "Direct",
+        "options": {}
+    },
+    "hostSettings": {
+        "limits": {
+            "staff": {
+                "max": 6,
+                "error": "Your publication is limited to 6 staff members (including admin). Please upgrade your plan to add more staff."
+            }
+        }
+    }
 }

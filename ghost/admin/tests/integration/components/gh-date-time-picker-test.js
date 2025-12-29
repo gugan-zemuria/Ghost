@@ -3,7 +3,7 @@ import hbs from 'htmlbars-inline-precompile';
 import moment from 'moment-timezone';
 import sinon from 'sinon';
 import {blur, click, fillIn, find, render} from '@ember/test-helpers';
-import {datepickerSelect} from 'ember-power-datepicker/test-support';
+import {datepickerSelect} from '../../helpers/datepicker-select';
 import {describe, it} from 'mocha';
 import {expect} from 'chai';
 import {setupRenderingTest} from 'ember-mocha';

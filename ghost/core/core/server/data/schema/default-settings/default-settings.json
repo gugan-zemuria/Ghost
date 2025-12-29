@@ -432,6 +432,7 @@
             "defaultValue": null,
             "type": "string"
         },
+
         "email_track_opens": {
             "defaultValue": "true",
             "validations": {

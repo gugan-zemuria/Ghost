@@ -18,8 +18,26 @@ const defaultModel = function defaultModel() {
 };
 
 export default class SigninRoute extends UnauthenticatedRoute {
+    queryParams = {
+        error: {
+            refreshModel: false
+        }
+    };
+
     model() {
         return defaultModel();
+    }
+
+    setupController(controller, model) {
+        super.setupController(controller, model);
+        
+        // Handle OAuth error from query params
+        const error = this.paramsFor('signin').error;
+        if (error === 'user_not_found') {
+            controller.flowErrors = 'No Ghost account found for this email. Please sign in with an existing account.';
+        } else if (error === 'oauth_error') {
+            controller.flowErrors = 'There was a problem signing in with Google. Please try again.';
+        }
     }
 
     // the deactivate hook is called after a route has been exited.

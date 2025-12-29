@@ -40,6 +40,11 @@ export default class SigninController extends Controller.extend(ValidationEngine
         return this.model;
     }
 
+    get googleOAuthEnabled() {
+        // Google OAuth is hardcoded to be enabled (no admin settings)
+        return true;
+    }
+
     @action
     handleInput(event) {
         this.signin[event.target.name] = event.target.value;

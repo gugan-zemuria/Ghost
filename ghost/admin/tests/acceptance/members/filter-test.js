@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import {authenticateSession} from 'ember-simple-auth/test-support';
 import {blur, click, currentURL, fillIn, find, findAll, focus} from '@ember/test-helpers';
 import {cleanupMockAnalyticsApps, mockAnalyticsApps} from '../../helpers/mock-analytics-apps';
-import {datepickerSelect} from 'ember-power-datepicker/test-support';
+import {datepickerSelect} from '../../helpers/datepicker-select';
 import {enableNewsletters} from '../../helpers/newsletters';
 import {enablePaidMembers} from '../../helpers/members';
 import {enableStripe} from '../../helpers/stripe';
